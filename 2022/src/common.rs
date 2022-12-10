@@ -25,8 +25,14 @@ pub fn read_ints(filename: &str) -> Vec<i32>
     let lines = BufReader::new(file).lines();
     let mut bla = Vec::new();// Vec<i32>::new();
     for line_result in lines {
-        
-        bla.push(0i32);
+//        bla.push(line_result.parse::i32.ok());
+//        bla.push(str::parse::<i32>(&line_result.unwrap()).ok_or(-1i32));
+        //let val: i32 = line_result.parse()
+        //match line_result.parse::<i32>() {
+        match str::parse::<i32>(&line_result.unwrap()) {
+            Ok(okay) => { bla.push(okay)}
+            Err(_) => { bla.push(-1i32) }
+        }
     }
     return bla
 //  lines.filter_map(Result::ok)
