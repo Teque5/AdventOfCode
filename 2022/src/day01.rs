@@ -3,87 +3,60 @@
 
 #[path = "common.rs"] mod common;
 
-use std::fs::File;
-use std::str::FromStr;
-use std::io::BufRead;
-use std::io::BufReader;
-use std::io::Result;
-
-/*
-// Three-element sliding window.
-struct SlidingFilter {
-    p1: Option<u64>,
-    p2: Option<u64>,
-}
-
-impl SlidingFilter {
-    fn new() -> SlidingFilter {
-        SlidingFilter {p1:None, p2:None}
-    }
-
-    fn next(&mut self, x: &u64) -> Option<u64> {
-        // Do we have enough inputs to emit a new result?
-        let mut result : Option<u64> = None;
-        if let (Some(y), Some(z)) = (self.p1, self.p2) {
-            result = Some(*x + y + z);
-        }
-        // Update internal state before returning.
-        self.p2 = self.p1;
-        self.p1 = Some(*x);
-        return result
-    }
-}
-
-
-fn filter(invec: &Vec<u64>) -> Vec<u64> {
-    let mut filt = SlidingFilter::new();
-    return invec.iter().filter_map(|x| filt.next(x)).collect()
-}
-
-// Count the number of times the depth increases.
-fn count_increase(x: &Vec<u64>) -> u64 {
-    let mut count = 0u64;
-    let mut prev : Option<u64> = None;
-    for depth in x.iter() {
-        if let Some(pdepth) = prev {
-            if depth > &pdepth {
-                count += 1;
-            }
-        }
-        prev = Some(*depth);
-    }
-    return count
-}
-*/
-
-// Part-1 solution (raw data)
-fn part1(filename: &str) -> u64 {
-    // Load input from file (one integer per line)
-    //let x = common::read_lines_as::<u64>(filename);
+fn part1(filename: &str) -> i32 {
+    let mut idx = 1i32;
+    let mut acc = 0i32;
+    let mut max = (0i32, 0i32); // idx, val
     let x = common::read_ints(filename);
-    for val in x.iter() {
-        
-        println!("{}", val);
+    for &val in x.iter() {
+        if val >= 0 {
+            acc += val;
+        } else {
+            if max.1 < acc {
+                max = (idx, acc);
+                println!("{} {}", max.0, max.1);
+            }
+            acc = 0;
+            idx += 1;
+        }
     }
-    //return count_increase(&x)
-    return 0;
+    return max.1;
 }
-/*
-// Part-2 solution (filtered data)
-fn part2(filename: &str) -> u64 {
-    // Load input from file (one integer per line)
-    let x = common::read_lines_as::<u64>(filename);
-    return count_increase(&filter(&x))
+
+fn part2(filename: &str) -> i32 {
+    let mut sums = Vec::new();
+    let mut acc = 0i32;
+
+    let x = common::read_ints(filename);
+    for &val in x.iter() {
+        if val >= 0 {
+            acc += val;
+        } else {
+            sums.push(acc);
+//            println!("{}", acc);
+            acc = 0;
+        }
+    }
+    if acc != 0 {
+        sums.push(acc);
+    }
+    sums.sort_unstable();
+    for &sum in sums.iter() {
+//        println!("{}", sum)
+    }
+    let total = sums.iter().rev().take(3).sum();
+    return total
 }
-*/
 
 pub fn solve() {
     // Test part-1 solver, then apply to real input.
-    assert_eq!(part1("input/01_train"), 4);
-    println!("Part1: {}", part1("input/01_train"));
-/*
+    //assert_eq!(part1("input/01_train"), 24000);
+    assert_eq!(part1("input/01_train"), common::read_lines_as::<i32>("input/01_val1")[0]);
+    println!();
+    println!("Part1: {}", part1("input/01_test"));
+
     // Test part-2 solver, then apply to real input.
-    assert_eq!(part2("input/test01.txt"), 5);
-    println!("Part2: {}", part2("input/input01.txt"));
-*/
+    assert_eq!(part2("input/01_train"), common::read_lines_as::<i32>("input/01_val2")[0]);
+    println!("Part2: {}", part2("input/01_test"));
+
 }
