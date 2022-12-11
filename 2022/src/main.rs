@@ -9,7 +9,7 @@ use std::collections::HashMap;
 use std::env;
 use std::time;
 mod day01;
-//mod day02;
+mod day02;
 //mod day03;
 //mod day04;
 //mod day05;
@@ -38,7 +38,7 @@ mod day01;
 lazy_static! {
     static ref SOLUTIONS: HashMap<usize, fn()> = vec![
         (1,  day01::solve as fn()),
-//        (2,  day02::solve as fn()),
+        (2,  day02::solve as fn()),
 //        (3,  day03::solve as fn()),
 //        (4,  day04::solve as fn()),
 //        (5,  day05::solve as fn()),
@@ -73,8 +73,8 @@ fn solve_timer(idx: &usize) -> u32 {
         println!("Starting Day {}", idx);
         let timer = time::Instant::now();
         uut();  // Run designated function
-        let elapsed = timer.elapsed().as_millis();
-        println!("Elapsed: {} msec.", elapsed);
+        let elapsed = timer.elapsed().as_micros();
+        println!("Elapsed: {} µs", elapsed);
         println!("");
         elapsed as u32
     } else {
