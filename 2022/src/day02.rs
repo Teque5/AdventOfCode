@@ -42,7 +42,7 @@ fn part1(filename: &str) -> i32 {
 
 fn part2(filename: &str) -> i32 {
     let mut acc = 0i32;
-    let mut action = '_';
+    let mut action;
     let lines = common::read_lines(filename);
     for line in lines.iter() {
         let game = common::split_str_as::<char>(line, ' ');
