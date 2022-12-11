@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 '''jump start with python for this puzzle'''
+import time
 from sympy.parsing.sympy_parser import parse_expr
 
 class monkey:
@@ -13,6 +14,7 @@ class monkey:
         self.inspect = 0
 
     def forward(self):
+        '''calculate round outcome'''
         outs = []
         for item in self.items:
             self.inspect += 1
@@ -38,6 +40,7 @@ class monkey:
             return 'MX'
 
 def readfile(filename, part2=False):
+    '''parse monkeys from setup'''
     monkeys = []
     with open(filename, 'rb') as derp:
         bla = derp.read()
@@ -95,10 +98,15 @@ if __name__ == '__main__':
         val1 = int(derp.read())
     #print(part1('../input/11_train'), val1)
     assert part1('../input/11_train') == val1
-    print('part1:', part1('../input/11_test'))
+    starttime = time.time()
+    print('Part1:', part1('../input/11_test'))
+    print(f'elap: {1e6*(time.time()-starttime):} µs')
 
     with open('../input/11_val2') as derp:
         val2 = int(derp.read())
     #print(part2('../input/11_train'), val2)
     assert part2('../input/11_train') == val2
-    print('part2:', part2('../input/11_test'))
+    starttime = time.time()
+    print('Part2:', part2('../input/11_test'))
+    print(f'elap : {1e6*(time.time()-starttime):} µs')
+

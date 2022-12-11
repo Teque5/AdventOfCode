@@ -74,7 +74,7 @@ fn solve_timer(idx: &usize) -> u32 {
         let timer = time::Instant::now();
         uut();  // Run designated function
         let elapsed = timer.elapsed().as_micros();
-        println!("Elapsed: {} µs", elapsed);
+        println!("elap: {} µs", elapsed);
         println!("");
         elapsed as u32
     } else {
@@ -96,7 +96,7 @@ fn main() {
         for idx in keys.iter() {
             elapsed += solve_timer(idx);
         };
-        println!("Total elapsed time {} msec.", elapsed);
+        println!("total elapsed time {} µs", elapsed);
     } else if let Result::Ok(idx) = arg.parse::<usize>() {
         solve_timer(&idx);
     } else {

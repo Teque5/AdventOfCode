@@ -11,7 +11,7 @@ fn part1(filename: &str) -> i32 {
         } else {
             if max.1 < acc {
                 max = (idx, acc);
-                println!("{} {}", max.0, max.1);
+                //println!("{} {}", max.0, max.1);
             }
             acc = 0;
             idx += 1;
