@@ -16,30 +16,20 @@ pub fn read_lines(filename: &str) -> Vec<String>
     lines.filter_map(Result::ok).collect()
 }
 
-/// Read a file with one number per line.
+/// Read a file with one number per line. Return -1 if not parsable.
 #[allow(dead_code)]
 pub fn read_ints(filename: &str) -> Vec<i32>
 {
-// KYLES CUSTOM GARBAGE
     let file = File::open(filename).unwrap();
     let lines = BufReader::new(file).lines();
     let mut bla = Vec::new();// Vec<i32>::new();
     for line_result in lines {
-//        bla.push(line_result.parse::i32.ok());
-//        bla.push(str::parse::<i32>(&line_result.unwrap()).ok_or(-1i32));
-        //let val: i32 = line_result.parse()
-        //match line_result.parse::<i32>() {
         match str::parse::<i32>(&line_result.unwrap()) {
             Ok(okay) => { bla.push(okay)}
             Err(_) => { bla.push(-1i32) }
         }
     }
     return bla
-//  lines.filter_map(Result::ok)
-//         .filter_map(|line| line.trim().parse::<T>().ok())
-//         .filter_map(|line| line.trim().parse::<i32>().ok())
-//         .map(|line| line.trim().parse::<T>())
-//       .collect()
 }
 
 /// Read a file with one number per line.
@@ -50,7 +40,6 @@ pub fn read_lines_as<T: FromStr>(filename: &str) -> Vec<T>
     let lines = BufReader::new(file).lines();
     lines.filter_map(Result::ok)
          .filter_map(|line| line.trim().parse::<T>().ok())
-//         .map(|line| line.trim().parse::<T>())
          .collect()
 }
 

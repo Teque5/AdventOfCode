@@ -1,6 +1,3 @@
-/// Day 1: https://adventofcode.com/2021/day/1
-/// Copyright 2021 by Alex Utter
-
 #[path = "common.rs"] mod common;
 
 fn part1(filename: &str) -> i32 {
@@ -41,16 +38,15 @@ fn part2(filename: &str) -> i32 {
         sums.push(acc);
     }
     sums.sort_unstable();
-    for &sum in sums.iter() {
+//    for sum in sums.iter() {
 //        println!("{}", sum)
-    }
+//    }
     let total = sums.iter().rev().take(3).sum();
     return total
 }
 
 pub fn solve() {
     // Test part-1 solver, then apply to real input.
-    //assert_eq!(part1("input/01_train"), 24000);
     assert_eq!(part1("input/01_train"), common::read_lines_as::<i32>("input/01_val1")[0]);
     println!();
     println!("Part1: {}", part1("input/01_test"));
