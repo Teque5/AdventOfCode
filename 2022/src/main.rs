@@ -1,6 +1,6 @@
-/// Top-level dispatcher for my Advent Of Code 2022 solutions.
+/// Top-level dispatcher for Advent Of Code 2022 solutions
 /// See also: https://adventofcode.com/2022/
-///     To run a given day's solution: cargo run [day#]
+/// To run a given day's solution: cargo run [day#]
 
 #[macro_use]
 extern crate lazy_static;
@@ -13,7 +13,7 @@ mod day02;
 mod day03;
 mod day04;
 mod day05;
-//mod day06;
+mod day06;
 //mod day07;
 //mod day08;
 //mod day09;
@@ -42,7 +42,7 @@ lazy_static! {
         (3,  day03::solve as fn()),
         (4,  day04::solve as fn()),
         (5,  day05::solve as fn()),
-//        (6,  day06::solve as fn()),
+        (6,  day06::solve as fn()),
 //        (7,  day07::solve as fn()),
 //        (8,  day08::solve as fn()),
 //        (9,  day09::solve as fn()),
