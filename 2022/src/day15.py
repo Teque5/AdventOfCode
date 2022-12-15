@@ -2,8 +2,7 @@
 '''falling sand'''
 import time
 import numpy as np
-
-
+import numba
 
 def main(filename, loverow=2000000, fullbuffer=False):
     '''
@@ -58,7 +57,7 @@ def main(filename, loverow=2000000, fullbuffer=False):
         dist = matdist(sensor, beacon)
         # fill up adjacent area
         # scan top to bottom
-        if sx != 8: continue
+        #if sx != 8: continue
         for odx, offset in enumerate(np.arange(sy-dist+ybonus, sy+ybonus+1)):
             # scan from top to middle
             if fullbuffer:
@@ -110,8 +109,23 @@ def main2(filename, zzyzx=4000000):
     # draw map (3x for extra headroom, indent by ymax)
     #print(bufrow.shape)
     for loverow in range(zzyzx):
+        checkrow(loverow, zzyzx, sensors, beacons)
+
+        if False:
+            for val in bufrow:
+                print(val, end='') 
+            print()
+        if loverow % 10000 == 0:
+            print(loverow)
+
+
+@numba.njit(parallel=True)
+def checkrow(loverow, zzyzx, sensors, beacons):
+    if True:
         bufrow = np.zeros((zzyzx), dtype=np.uint8)
-        for (sensor, beacon) in zip(sensors, beacons):
+        for sdx in range(len(sensors)):
+            sensor = sensors[sdx]
+            beacon = beacons[sdx]
             # draw sensors & beacons
             sx, sy = sensor
             bx, by = beacon
@@ -137,31 +151,62 @@ def main2(filename, zzyzx=4000000):
 #                    print(loverow,'dbug-lo', sx-(dist-odx)+1, sx+dist-odx)
                     minibuf = bufrow[max(sx-(dist-odx)+1, 0):min(sx+(dist-odx), zzyzx)]
                     minibuf[minibuf < 5] = 3
-
-        if False:
-            for val in bufrow:
-                print(val, end='') 
-            print()
         possible = np.sum(bufrow == 0)
         if possible > 0:
             xvals = np.argwhere(bufrow == 0).ravel()
             print('row', loverow, 'poss', possible, xvals, 'here!', xvals[0]*4000000+loverow)
-        if loverow % 100 == 0:
-            print(loverow)
 
 def printbuf(buffer, xbonus, ybonus):
     for rdx, row in enumerate(buffer):
-        if rdx == 11+ybonus:
-            print('       '+' '*(xbonus)+ '|')
+#        if rdx == 11+ybonus:
+#            print('       '+' '*(xbonus)+ '|')
         print(f'{rdx-ybonus:4d} ',end='')
         for item in row:
             print(item,end='')
         print()
 
+@numba.njit
 def matdist(a, b):
     '''manhattan distance'''
     return abs(a[1]-b[1]) + abs(a[0]-b[0])
 
+def norm(a,b):
+    return ((a[1]-b[1])**2 + (a[0]-b[0])**2)**0.5
+
+def main3(filename):
+    '''
+    just plot circles and inspect
+
+    todo: this method is OKAY but needs to be re-done in PIL for pixel-quality circles
+    '''
+    # parse sensors and whatnot
+    with open(filename, 'rb') as derp:
+        bla = derp.read().strip()
+    sensors = []
+    beacons = []
+    for row in bla.split(b'\n'):
+        left, right = row.split(b':')
+        leftx, lefty = left.split(b',')
+        rightx, righty = right.split(b',')
+        leftx = int(leftx.split(b'=')[1])
+        lefty = int(lefty.split(b'=')[1])
+        rightx = int(rightx.split(b'=')[1])
+        righty = int(righty.split(b'=')[1])
+        sensors += [(leftx, lefty)]
+        beacons += [(rightx, righty)]
+    import matplotlib.pyplot as plt
+    for (sensor, beacon) in zip(sensors, beacons):
+        dist0 = matdist(sensor, beacon)*.8
+        dist1 = norm(sensor, beacon)
+        print(dist0, dist1)
+        for dguess in np.linspace(dist0, dist1, 50): 
+            circle = plt.Circle((sensor[0], sensor[1]), dguess, fill=False, edgecolor='b', alpha=.1)
+            plt.gca().add_artist(circle)
+    plt.axvline(2750000)
+    plt.axhline(3450000)
+    plt.ylim(0,4000000)
+    plt.xlim(0,4000000)
+    plt.show()
 
 if __name__ == '__main__':
     with open('../input/15_val1') as derp:
@@ -169,16 +214,19 @@ if __name__ == '__main__':
     #with open('../input/15_val2') as derp:
     #    val2 = int(derp.read())
     
-    #assert main('../input/15_train', loverow=10) == val1
+    assert main('../input/15_train', loverow=10) == val1
     print(main('../input/15_train', loverow=10, fullbuffer=True))
     starttime = time.time()
-    ''''
     print('Part1:', main('../input/15_test', loverow=2000000))
     print(f'elap: {1e6*(time.time()-starttime):} µs')
     #assert main('../input/15_train', part2=True) == val2
-    '''
-    starttime = time.time()
-    print(main2('../input/15_train', zzyzx=21))
-    print('Part2:', main2('../input/15_test', zzyzx=4000001))
-    print(f'elap: {1e6*(time.time()-starttime):} µs')
+    
 
+#    starttime = time.time()
+#    print(main2('../input/15_train', zzyzx=21))
+#    print('Part2:', main2('../input/15_test', zzyzx=4000001))
+#    print(f'elap: {1e6*(time.time()-starttime):} µs')
+
+    starttime = time.time()
+    print('Part2:', main3('../input/15_test'))
+    print(f'elap: {1e6*(time.time()-starttime):} µs')
