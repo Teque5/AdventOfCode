@@ -76,16 +76,20 @@ def main(filename, part2=False):
         if part2 and buffer[0, 500-xmin] != 0:
             ok = False
         if False:
+            trimsize = buffer.shape[0] > 20
             # export frames for our old friend, FFMPEG
             # ffmpeg -framerate 60 -i frame_177_frame%04d.png out2.webm
+            if trimsize and acc %50 != 0:
+                continue
             from PIL import Image
             import matplotlib.pyplot as plt
             bufnorm = buffer.astype(np.float32) / 7
             img = Image.fromarray(np.uint8(plt.cm.viridis(bufnorm)*255))
             # upscale small images
-            if img.size[0] < 20:
+            if not trimsize:
                 img = img.resize((img.size[0]*4, img.size[1]*4), Image.NEAREST)
-            img.save(f'/tmp/frame_{buffer.shape[0]+1*part2}_frame{acc:04d}.png')
+            fdx = acc // 50 if trimsize else acc
+            img.save(f'/tmp/frame_{buffer.shape[0]+1*part2}_frame{fdx:04d}.png')
     print(buffer, buffer.shape)
     return acc
 
