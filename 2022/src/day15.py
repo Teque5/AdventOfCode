@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-'''falling sand'''
+'''find the beacon'''
 import time
 import numpy as np
 import numba
+from scipy.optimize import dual_annealing
 
-def main(filename, loverow=2000000, fullbuffer=False):
+
+def main_naive(filename:str, loverow:int=2000000, fullbuffer:bool=False) -> int:
     '''
+    create a buffer and just fill it up with sensors and whatnot
     '''
     # parse sensors and whatnot
     with open(filename, 'rb') as derp:
@@ -32,13 +35,13 @@ def main(filename, loverow=2000000, fullbuffer=False):
     # draw map (3x for extra headroom, indent by ymax)
     xspan = (xmax-xmin)//2
     ybonus = (ymax-ymin)//2
-    #print(xspan,'xspan')
+
     if fullbuffer:
         buffer = np.zeros((ymax-ymin+ybonus*2+1, xmax-xmin+xspan*2+1), dtype=np.uint8)
     bufrow = np.zeros((xmax-xmin+xspan*2+1), dtype=np.uint8)
-    #print(bufrow.shape)
+
     if fullbuffer:
-        print(buffer.shape,'buff')
+        print(buffer.shape, 'buff')
     for (sensor, beacon) in zip(sensors, beacons):
         sx, sy = sensor
         bx, by = beacon
@@ -57,7 +60,7 @@ def main(filename, loverow=2000000, fullbuffer=False):
         dist = matdist(sensor, beacon)
         # fill up adjacent area
         # scan top to bottom
-        #if sx != 8: continue
+        # if sx != 8: continue
         for odx, offset in enumerate(np.arange(sy-dist+ybonus, sy+ybonus+1)):
             # scan from top to middle
             if fullbuffer:
@@ -75,14 +78,16 @@ def main(filename, loverow=2000000, fullbuffer=False):
                 minibuf = bufrow[sx-xmin-(dist-odx)+1+xspan:sx-xmin+(dist-odx)+xspan]
                 minibuf[minibuf < 5] = 3
 
-    if fullbuffer:    
+    if fullbuffer:
         printbuf(buffer, xspan, ybonus)
     #print(bufrow)
-    return np.sum(bufrow == 3)   
+    return np.sum(bufrow == 3)
 
-def main2(filename, zzyzx=4000000):
+
+def main_optimize(filename:str, zzyzx:int=4000000) -> int:
     '''
-    beacon must be within 0-zzyxz for both x & y
+    use an optimizer to find the lowest cost
+    13360899249595 is correct
     '''
     # parse sensors and whatnot
     with open(filename, 'rb') as derp:
@@ -91,6 +96,7 @@ def main2(filename, zzyzx=4000000):
     ymin, ymax = np.inf, -np.inf
     sensors = []
     beacons = []
+    dists = []
     for row in bla.split(b'\n'):
         left, right = row.split(b':')
         leftx, lefty = left.split(b',')
@@ -105,79 +111,71 @@ def main2(filename, zzyzx=4000000):
         xmax = max(xmax, leftx, rightx)
         sensors += [(leftx, lefty)]
         beacons += [(rightx, righty)]
+        dist = matdist((leftx, lefty), (rightx, righty))
+        dists += [dist]
 
-    # draw map (3x for extra headroom, indent by ymax)
-    #print(bufrow.shape)
-    for loverow in range(zzyzx):
-        checkrow(loverow, zzyzx, sensors, beacons)
+    sensors = np.array(sensors, dtype=int)
+    dists = np.array(dists, dtype=int)
 
-        if False:
-            for val in bufrow:
-                print(val, end='') 
-            print()
-        if loverow % 10000 == 0:
-            print(loverow)
+    fcost = lambda point: cost(point, sensors, dists)
+    fval = np.inf
+    while fval > .1:
+        result = dual_annealing(fcost, bounds=((0, zzyzx), (0, zzyzx)), maxiter=3000)
+        fval = result.fun
+        front = 'ok!  ' if fval < .1 else '     '
+        print(f'{front}x={result.x[0]} y={result.x[1]} fval={result.fun:.2f} iters={result.nit}')
+    print('here we go!', result.x[0]*4000000+result.x[1])
+
+    # Plot it
+    if False:
+        bla = np.empty((zzyzx, zzyzx), dtype=np.int)
+        for rdx in range(zzyzx):
+            for cdx in range(zzyzx):
+                bla[rdx, cdx] = fcost((cdx, rdx))
+            print(f'{rdx:2d}', bla[rdx], 'bug?')
+        import matplotlib.pyplot as plt
+        plt.imshow(bla, interpolation=None, aspect='equal', extent=[0, 20, 0, 20])
+        # recall y is flipped w.r.t. sensor locations
+        plt.scatter(sensors[:, 0], zzyzx-sensors[:, 1]-1)
+        plt.show()
+
+    return int(np.round(result.x[0]*4000000+result.x[1]))
 
 
-@numba.njit(parallel=True)
-def checkrow(loverow, zzyzx, sensors, beacons):
-    if True:
-        bufrow = np.zeros((zzyzx), dtype=np.uint8)
-        for sdx in range(len(sensors)):
-            sensor = sensors[sdx]
-            beacon = beacons[sdx]
-            # draw sensors & beacons
-            sx, sy = sensor
-            bx, by = beacon
-            if sy == loverow:
-                if sx >= 0 and sx < zzyzx:
-                    bufrow[sx] = 7 # let 7 be sensor
-            if by == loverow:
-                if bx >= 0 and bx < zzyzx:
-                    bufrow[bx] = 5 # let 5 be beacon
-            # draw sensor zones
-            dist = matdist(sensor, beacon)
-#            if sx == 8:
-            if True:
-                if sy >= loverow:
-                    # scan up
-                    odx = loverow-sy+dist
-#                    print(loverow, 'dbug-hi',sx-odx, sx+1+odx, odx,'dbug')
-                    minibuf = bufrow[max(sx-odx, 0):min(sx+1+odx, zzyzx)]
-                    minibuf[minibuf < 5] = 3
-                else:
-                    # scan down
-                    odx = loverow - sy - 1
-#                    print(loverow,'dbug-lo', sx-(dist-odx)+1, sx+dist-odx)
-                    minibuf = bufrow[max(sx-(dist-odx)+1, 0):min(sx+(dist-odx), zzyzx)]
-                    minibuf[minibuf < 5] = 3
-        possible = np.sum(bufrow == 0)
-        if possible > 0:
-            xvals = np.argwhere(bufrow == 0).ravel()
-            print('row', loverow, 'poss', possible, xvals, 'here!', xvals[0]*4000000+loverow)
+def cost(point, sensors, dists) -> int:
+    point_to_sensors = matdistvec(sensors, point)
+    # print(dists-point_to_sensors)
+    height = dists-point_to_sensors+1
+    height[height < 0] = 0
+    return np.sum(height)
 
-def printbuf(buffer, xbonus, ybonus):
-    for rdx, row in enumerate(buffer):
-#        if rdx == 11+ybonus:
-#            print('       '+' '*(xbonus)+ '|')
-        print(f'{rdx-ybonus:4d} ',end='')
-        for item in row:
-            print(item,end='')
-        print()
+
+@numba.njit()
+def matdistvec(avec, bbb) -> int:
+    '''manhattan distance for a vector of points to a point'''
+    return np.sum(np.abs(avec-bbb), axis=1)
+
 
 @numba.njit
-def matdist(a, b):
+def matdist(aaa, bbb) -> int:
     '''manhattan distance'''
-    return abs(a[1]-b[1]) + abs(a[0]-b[0])
+    return abs(aaa[1]-bbb[1]) + abs(aaa[0]-bbb[0])
 
-def norm(a,b):
-    return ((a[1]-b[1])**2 + (a[0]-b[0])**2)**0.5
 
-def main3(filename):
+def printbuf(buffer, xbonus, ybonus) -> None:
+    for rdx, row in enumerate(buffer):
+        if rdx == 11+ybonus:
+            print('       '+' '*(xbonus)+ '0    5    1    1    2')
+            print('       '+' '*(xbonus)+ '          0    5    0')
+        print(f'{rdx-ybonus:4d} ', end='')
+        for item in row:
+            print(item, end='')
+        print()
+
+
+def main_polygons(filename:str, zzyzx:int) -> None:
     '''
-    just plot circles and inspect
-
-    todo: this method is OKAY but needs to be re-done in PIL for pixel-quality circles
+    just plot circles and inspect, did not work; inscrutable
     '''
     # parse sensors and whatnot
     with open(filename, 'rb') as derp:
@@ -195,38 +193,52 @@ def main3(filename):
         sensors += [(leftx, lefty)]
         beacons += [(rightx, righty)]
     import matplotlib.pyplot as plt
+    cdx = -1
+    colors = plt.get_cmap('tab20')
     for (sensor, beacon) in zip(sensors, beacons):
-        dist0 = matdist(sensor, beacon)*.8
-        dist1 = norm(sensor, beacon)
-        print(dist0, dist1)
-        for dguess in np.linspace(dist0, dist1, 50): 
-            circle = plt.Circle((sensor[0], sensor[1]), dguess, fill=False, edgecolor='b', alpha=.1)
-            plt.gca().add_artist(circle)
-    plt.axvline(2750000)
-    plt.axhline(3450000)
-    plt.ylim(0,4000000)
-    plt.xlim(0,4000000)
+        cdx += 1
+        # if sensor[0] != 8: continue
+        dist0 = matdist(sensor, beacon) +.5
+        width = dist0 * np.sqrt(2) / 2
+        print(sensor,dist0)
+        # plt.axvline(sensor[0])
+        # plt.axhline(sensor[1])
+        if dist0 > 100000:
+            # biggest rects
+            rect = plt.Rectangle(
+                (sensor[0]-width, sensor[1]-width),
+                width*2, width*2, facecolor=colors(cdx),
+                edgecolor=None, alpha=.9, angle=45, rotation_point=(sensor[0], sensor[1])
+            )
+        else:
+            rect = plt.Rectangle(
+                (sensor[0]-width, sensor[1]-width),
+                width*2, width*2, facecolor=colors(cdx),
+                edgecolor='k', alpha=.5, angle=45, rotation_point=(sensor[0], sensor[1])
+            )
+        # circle = plt.Circle((sensor[0], sensor[1]), dguess, fill=False, edgecolor='b', alpha=.1)
+        plt.gca().add_artist(rect)
+    plt.ylim(0, zzyzx)
+    plt.xlim(0, zzyzx)
+    plt.grid()
+    plt.gca().set_aspect(1)
     plt.show()
+
 
 if __name__ == '__main__':
     with open('../input/15_val1') as derp:
         val1 = int(derp.read())
-    #with open('../input/15_val2') as derp:
-    #    val2 = int(derp.read())
-    
-    assert main('../input/15_train', loverow=10) == val1
-    print(main('../input/15_train', loverow=10, fullbuffer=True))
+    with open('../input/15_val2') as derp:
+        val2 = int(derp.read())
+
+    # part 1
+    assert main_naive('../input/15_train', loverow=10, fullbuffer=True) == val1
     starttime = time.time()
-    print('Part1:', main('../input/15_test', loverow=2000000))
+    print('Part1:', main_naive('../input/15_test', loverow=2000000))
     print(f'elap: {1e6*(time.time()-starttime):} µs')
-    #assert main('../input/15_train', part2=True) == val2
-    
 
-#    starttime = time.time()
-#    print(main2('../input/15_train', zzyzx=21))
-#    print('Part2:', main2('../input/15_test', zzyzx=4000001))
-#    print(f'elap: {1e6*(time.time()-starttime):} µs')
-
+    # part 2
+    assert main_optimize('../input/15_train', zzyzx=21) == val2
     starttime = time.time()
-    print('Part2:', main3('../input/15_test'))
+    print('Part2:', main_optimize('../input/15_test', zzyzx=4000001))
     print(f'elap: {1e6*(time.time()-starttime):} µs')
