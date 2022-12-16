@@ -6,3 +6,4 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 
 Using this as an opportunity to learn [rust](https://www.rust-lang.org/). I did use python on some of the puzzles where I was racing against colleagues. :D
 
+![day15](2022/img/day15.webp)
