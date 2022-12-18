@@ -33,7 +33,6 @@ pub fn solve() {
     // validate each solver, then apply to test 
     // compare 4 values
     assert_eq!(part("input/06_train", 4), common::read_lines_as::<i32>("input/06_val1")[0]);
-    println!();
     println!("Part1: {}", part("input/06_test", 4));
 
     // compare 14 values
