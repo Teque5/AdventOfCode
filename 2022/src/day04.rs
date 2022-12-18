@@ -51,7 +51,6 @@ fn part2(filename: &str) -> i32 {
 pub fn solve() {
     // validate each solver, then apply to test 
     assert_eq!(part1("input/04_train"), common::read_lines_as::<i32>("input/04_val1")[0]);
-    println!();
     println!("Part1: {}", part1("input/04_test"));
 
     assert_eq!(part2("input/04_train"), common::read_lines_as::<i32>("input/04_val2")[0]);

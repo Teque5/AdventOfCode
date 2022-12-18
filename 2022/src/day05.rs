@@ -69,8 +69,8 @@ fn part(filename: &str, is_9001: bool) -> String {
 
 pub fn solve() {
     // validate each solver, then apply to test 
-    assert_eq!(part("input/05_train", false), common::read_lines("input/05_val1")[0]);
-    println!();
+    assert_eq!(
+        part("input/05_train", false), common::read_lines("input/05_val1")[0]);
     println!("Part1: {}", part("input/05_test", false));
 
     assert_eq!(
