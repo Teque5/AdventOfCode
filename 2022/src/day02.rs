@@ -37,7 +37,6 @@ fn part1(filename: &str) -> i32 {
         //println!("{} {} {}", game[0], game[1], acc);
     }
     return acc;
-    
 }
 
 fn part2(filename: &str) -> i32 {
@@ -115,17 +114,20 @@ fn part2(filename: &str) -> i32 {
         //println!("{} {} {}", game[0], game[1], acc);
     }
     return acc;
-    
 }
 
 pub fn solve() {
     // Test part-1 solver, then apply to real input.
-    assert_eq!(part1("input/02_train"), common::read_lines_as::<i32>("input/02_val1")[0]);
-    println!();
+    assert_eq!(
+        part1("input/02_train"),
+        common::read_lines_as::<i32>("input/02_val1")[0]
+    );
     println!("Part1: {}", part1("input/02_test"));
 
     // Test part-2 solver, then apply to real input.
-    assert_eq!(part2("input/02_train"), common::read_lines_as::<i32>("input/02_val2")[0]);
+    assert_eq!(
+        part2("input/02_train"),
+        common::read_lines_as::<i32>("input/02_val2")[0]
+    );
     println!("Part2: {}", part2("input/02_test"));
-
 }

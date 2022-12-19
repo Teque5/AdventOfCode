@@ -11,7 +11,6 @@ fn part1(filename: &str) -> i32 {
         } else {
             if max.1 < acc {
                 max = (idx, acc);
-                //println!("{} {}", max.0, max.1);
             }
             acc = 0;
             idx += 1;
@@ -30,7 +29,6 @@ fn part2(filename: &str) -> i32 {
             acc += val;
         } else {
             sums.push(acc);
-//            println!("{}", acc);
             acc = 0;
         }
     }
@@ -38,21 +36,22 @@ fn part2(filename: &str) -> i32 {
         sums.push(acc);
     }
     sums.sort_unstable();
-//    for sum in sums.iter() {
-//        println!("{}", sum)
-//    }
     let total = sums.iter().rev().take(3).sum();
-    return total
+    return total;
 }
 
 pub fn solve() {
     // Test part-1 solver, then apply to real input.
-    assert_eq!(part1("input/01_train"), common::read_lines_as::<i32>("input/01_val1")[0]);
-    println!();
+    assert_eq!(
+        part1("input/01_train"),
+        common::read_lines_as::<i32>("input/01_val1")[0]
+    );
     println!("Part1: {}", part1("input/01_test"));
 
     // Test part-2 solver, then apply to real input.
-    assert_eq!(part2("input/01_train"), common::read_lines_as::<i32>("input/01_val2")[0]);
+    assert_eq!(
+        part2("input/01_train"),
+        common::read_lines_as::<i32>("input/01_val2")[0]
+    );
     println!("Part2: {}", part2("input/01_test"));
-
 }

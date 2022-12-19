@@ -19,7 +19,6 @@ fn part1(filename: &str) -> i32 {
         }
     }
     return acc;
-    
 }
 
 fn part2(filename: &str) -> i32 {
@@ -42,18 +41,21 @@ fn part2(filename: &str) -> i32 {
         } else if right[1] >= left[0] && right[1] <= left[1] {
             acc += 1;
         }
-
     }
     return acc;
-    
 }
 
 pub fn solve() {
-    // validate each solver, then apply to test 
-    assert_eq!(part1("input/04_train"), common::read_lines_as::<i32>("input/04_val1")[0]);
+    // validate each solver, then apply to test
+    assert_eq!(
+        part1("input/04_train"),
+        common::read_lines_as::<i32>("input/04_val1")[0]
+    );
     println!("Part1: {}", part1("input/04_test"));
 
-    assert_eq!(part2("input/04_train"), common::read_lines_as::<i32>("input/04_val2")[0]);
+    assert_eq!(
+        part2("input/04_train"),
+        common::read_lines_as::<i32>("input/04_val2")[0]
+    );
     println!("Part2: {}", part2("input/04_test"));
-
 }

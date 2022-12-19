@@ -21,7 +21,7 @@ fn part(filename: &str, is_9001: bool) -> String {
         } else {
             for (vdx, val) in line.chars().enumerate() {
                 if vdx % 2 != 0 && val != ' ' {
-                    topstack[(vdx-1)/4].push(val);
+                    topstack[(vdx - 1) / 4].push(val);
                 }
             }
         }
@@ -32,27 +32,26 @@ fn part(filename: &str, is_9001: bool) -> String {
         let count = tokens[1].parse::<usize>().unwrap();
         let move_from = tokens[3].parse::<usize>().unwrap();
         let move_to = tokens[5].parse::<usize>().unwrap();
-//        println!("dbug {} {} {}", count, move_from, move_to);
+        //println!("dbug {} {} {}", count, move_from, move_to);
         if is_9001 {
             // move crates as a group
             let mut buffer = Vec::new();
             for _ in 0..count {
-                buffer.push(topstack[move_from-1].pop().unwrap());
+                buffer.push(topstack[move_from - 1].pop().unwrap());
             }
             buffer.reverse();
-            topstack[move_to-1].extend(buffer);
-            
+            topstack[move_to - 1].extend(buffer);
         } else {
             // move crates one at a time
             for _ in 0..count {
-                let val = topstack[move_from-1].pop().unwrap();
-                topstack[move_to-1].push(val);
+                let val = topstack[move_from - 1].pop().unwrap();
+                topstack[move_to - 1].push(val);
             }
         }
     }
     let mut out = "".to_string();
 
-// verify stack
+    // verify stack
     for stack in topstack {
         out.push(*stack.last().unwrap());
         /*
@@ -66,11 +65,12 @@ fn part(filename: &str, is_9001: bool) -> String {
     return out;
 }
 
-
 pub fn solve() {
-    // validate each solver, then apply to test 
+    // validate each solver, then apply to test
     assert_eq!(
-        part("input/05_train", false), common::read_lines("input/05_val1")[0]);
+        part("input/05_train", false),
+        common::read_lines("input/05_val1")[0]
+    );
     println!("Part1: {}", part("input/05_test", false));
 
     assert_eq!(
@@ -78,5 +78,4 @@ pub fn solve() {
         common::read_lines("input/05_val2")[0]
     );
     println!("Part2: {}", part("input/05_test", true));
-
 }
