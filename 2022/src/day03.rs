@@ -1,8 +1,7 @@
 #[path = "common.rs"] mod common;
 
-
 fn part1(filename: &str) -> i32 {
-     let mut acc = 0i32;
+    let mut acc = 0i32;
     // read each pair
     let lines = common::read_lines(filename);
     for line in lines.iter() {
@@ -18,23 +17,20 @@ fn part1(filename: &str) -> i32 {
                 if ccc > 94 {
                     // lowercase
                     acc += ccc - 96;
- //                   println!("l {}", ccc-96);
                     break;
                 } else {
                     // uppercase
                     acc += ccc - 38;
-   //                 println!("u {}", ccc-38);
                     break;
                 }
             }
-
         }
     }
     return acc;
 }
 
 fn part2(filename: &str) -> i32 {
-     let mut acc = 0i32;
+    let mut acc = 0i32;
     // read each pair
     let lines = common::read_lines(filename);
     let chunks: Vec<_> = lines.chunks(3).collect();
@@ -45,12 +41,12 @@ fn part2(filename: &str) -> i32 {
                 if ccc > 94 {
                     // lowercase
                     acc += ccc - 96;
- //                   println!("l {}", ccc-96);
+                    //                   println!("l {}", ccc-96);
                     break;
                 } else {
                     // uppercase
                     acc += ccc - 38;
-   //                 println!("u {}", ccc-38);
+                    //                 println!("u {}", ccc-38);
                     break;
                 }
             }
@@ -60,12 +56,16 @@ fn part2(filename: &str) -> i32 {
 }
 
 pub fn solve() {
-    // validate each solver, then apply to test 
-    assert_eq!(part1("input/03_train"), common::read_lines_as::<i32>("input/03_val1")[0]);
-    println!();
+    // validate each solver, then apply to test
+    assert_eq!(
+        part1("input/03_train"),
+        common::read_lines_as::<i32>("input/03_val1")[0]
+    );
     println!("Part1: {}", part1("input/03_test"));
 
-    assert_eq!(part2("input/03_train"), common::read_lines_as::<i32>("input/03_val2")[0]);
+    assert_eq!(
+        part2("input/03_train"),
+        common::read_lines_as::<i32>("input/03_val2")[0]
+    );
     println!("Part2: {}", part2("input/03_test"));
-
 }

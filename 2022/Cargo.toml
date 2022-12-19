@@ -9,6 +9,7 @@ edition = "2021"
 [dependencies]
 itertools = "0.10.5"
 lazy_static = "1.4.*"
+ndarray = "0.15.6"
 
 [[bin]]
 name = "advent_2022"
