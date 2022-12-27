@@ -1,10 +1,5 @@
 #[path = "common.rs"] mod common;
 
-use ndarray::array;
-use ndarray::s;
-use ndarray::Array2;
-use ndarray::ArrayViewMut2;
-
 /// follow path of rope with head and tail
 fn part1(filename: &str) -> isize {
     // read the nonsense
@@ -48,7 +43,7 @@ fn part1(filename: &str) -> isize {
             ldx += 1;
         }
         //println!("{:04} reg={:5} acc={} ({} {})", cycle, reg, acc, bleeps[ldx], values[ldx]);
-        if (cycle == 20) || (cycle > 30 && (cycle+20) % 40 == 0) {
+        if (cycle == 20) || (cycle > 30 && (cycle + 20) % 40 == 0) {
             acc += reg * cycle as isize;
             //println!("{} {}", cycle, reg * cycle)
         }
@@ -56,7 +51,7 @@ fn part1(filename: &str) -> isize {
     }
     //println!("{:04} reg={:5} acc={}", cycle, reg, acc);
 
-    return acc
+    return acc;
 }
 
 fn part2(filename: &str) {
@@ -64,9 +59,7 @@ fn part2(filename: &str) {
     let lines = common::read_lines(filename);
     let mut bleeps: Vec<String> = Vec::new();
     let mut values: Vec<isize> = Vec::new();
-    //let mut screen: Vec<char> = Vec::with_capacity(6*40);
-    let mut screen = vec!['.'; 6*40];
-    let sprite = Vec::from("###.....................................");
+    let mut screen = vec!['.'; 6 * 40];
     let mut len: usize = 0;
     for line in lines.iter() {
         let mut parts = line.trim().split_whitespace();
@@ -78,15 +71,13 @@ fn part2(filename: &str) {
         len += 1;
     }
     let mut reg = 1isize; // register
-    let mut acc = 0isize; // output accumulator
 
     let mut ldx = 0;
     let mut cycle = 1;
     let mut wait = 0;
     let mut next = 0isize;
 
-    let mut position = 0isize; // position on the screen
-
+    let mut position: isize; // position on the screen
 
     while ldx != len {
         if wait > 0 {
@@ -106,19 +97,11 @@ fn part2(filename: &str) {
             }
             ldx += 1;
         }
-        //println!("{:04} reg={:5} acc={} ({} {})", cycle, reg, acc, bleeps[ldx], values[ldx]);
-        if (cycle == 20) || (cycle > 30 && (cycle+20) % 40 == 0) {
-            acc += reg * cycle as isize;
-            //println!("{} {}", cycle, reg * cycle)
-        }
-        position = (cycle-1) % 240;
-        //print!("cyc{:3} {:3} {:3}", cycle, position, reg);
-        if ((position-1) % 40 == reg) || ((position) % 40 == reg) || ((position+1) % 40 == reg) {
+        position = (cycle - 1) % 240;
+        if ((position - 1) % 40 == reg) || ((position) % 40 == reg) || ((position + 1) % 40 == reg) {
             screen[position as usize] = '#';
-            //println!("  #");
         } else {
             screen[position as usize] = '.';
-            //println!("  .");
         }
         cycle += 1;
     }
@@ -126,12 +109,11 @@ fn part2(filename: &str) {
     // draw screen
     for rdx in 0..6 {
         for cdx in 0..40 {
-            print!("{}", screen[rdx*40+cdx])
+            print!("{}", screen[rdx * 40 + cdx])
         }
         println!();
     }
 }
-
 
 pub fn solve() {
     let pdx = 10;

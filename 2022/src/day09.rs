@@ -37,8 +37,7 @@ fn part(filename: &str, part2: bool) -> i32 {
         if cpos < cmin {cmin = cpos}
         if cpos > cmax {cmax = cpos}
     }
-    let mut visit: Array2<usize> =
-        Array2::zeros(((rmax - rmin + 1) as usize, (cmax - cmin + 1) as usize));
+    let mut visit: Array2<usize> = Array2::zeros(((rmax - rmin + 1) as usize, (cmax - cmin + 1) as usize));
     if !part2 {
         // part 1
         let mut headpos = (-rmin as usize, -cmin as usize);
