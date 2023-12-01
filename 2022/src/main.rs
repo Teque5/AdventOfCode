@@ -24,7 +24,7 @@ mod day10;
 //mod day14;
 //mod day15;
 //mod day16;
-mod day17;
+// mod day17;
 //mod day18;
 //mod day19;
 //mod day20;
@@ -53,7 +53,7 @@ lazy_static! {
 //        (14, day14::solve as fn()),
 //        (15, day15::solve as fn()),
 //        (16, day16::solve as fn()),
-        (17, day17::solve as fn()),
+        // (17, day17::solve as fn()),
 //        (18, day18::solve as fn()),
 //        (19, day19::solve as fn()),
 //        (20, day20::solve as fn()),
@@ -72,7 +72,7 @@ fn solve_timer(idx: &usize) -> u32 {
     if let Some(uut) = SOLUTIONS.get(idx) {
         println!("Starting Day {}", idx);
         let timer = time::Instant::now();
-        uut();  // Run designated function
+        uut(); // Run designated function
         let elapsed = timer.elapsed().as_micros();
         println!("elap: {} µs", elapsed);
         println!("");
@@ -91,11 +91,11 @@ fn main() {
     if arg == "all" {
         // Solve every problem in the list.
         let mut elapsed = 0u32;
-        let mut keys:Vec<&usize> = SOLUTIONS.keys().collect();
-        keys.sort();    // Print in order...
+        let mut keys: Vec<&usize> = SOLUTIONS.keys().collect();
+        keys.sort(); // Print in order...
         for idx in keys.iter() {
             elapsed += solve_timer(idx);
-        };
+        }
         println!("total elapsed time {} µs", elapsed);
     } else if let Result::Ok(idx) = arg.parse::<usize>() {
         solve_timer(&idx);

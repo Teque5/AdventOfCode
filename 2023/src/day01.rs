@@ -27,11 +27,11 @@ fn part1(filename: &str) -> u64 {
 // This time we will first replace the words with numbers
 fn part2(filename: &str) -> u64 {
     let mut acc = 0u64;
-
     let lines = common::read_lines(filename);
     for line in lines.iter() {
         // get all numbers in each line
-        // let mut cleanline = line;
+        // due to some trickyness I keep the first and last letters of
+        // each number in this replace since they can overlap with adjacent
         let cleanline = line
             .replace("one", "o1e")
             .replace("two", "t2o")

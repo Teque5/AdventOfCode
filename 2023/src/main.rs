@@ -1,5 +1,5 @@
-/// Top-level dispatcher for Advent Of Code 2022 solutions
-/// See also: https://adventofcode.com/2022/
+/// Top-level dispatcher for Advent Of Code 2023 solutions
+/// See also: https://adventofcode.com/2023/
 /// To run a given day's solution: cargo run [day#]
 
 #[macro_use]
@@ -8,6 +8,8 @@ extern crate lazy_static;
 use std::collections::HashMap;
 use std::env;
 use std::time;
+mod fetch;
+
 mod day01;
 // mod day02;
 // mod day03;
@@ -67,7 +69,7 @@ lazy_static! {
     static ref EMPTY_STRING: String = String::from("");
 }
 
-// Wrapper that adds elapsed-time telemetry.
+/// Wrapper that adds elapsed-time telemetry.
 fn solve_timer(idx: &usize) -> u32 {
     if let Some(uut) = SOLUTIONS.get(idx) {
         println!("Starting Day {}", idx);
@@ -83,7 +85,7 @@ fn solve_timer(idx: &usize) -> u32 {
     }
 }
 
-// Main entry point looks at command-line arguments.
+/// Main entry point looks at command-line arguments.
 fn main() {
     let args: Vec<String> = env::args().collect();
     let arg = args.get(1).unwrap_or(&EMPTY_STRING);
@@ -94,10 +96,12 @@ fn main() {
         let mut keys: Vec<&usize> = SOLUTIONS.keys().collect();
         keys.sort(); // Print in order...
         for idx in keys.iter() {
+            fetch::get_data(2023, **idx);
             elapsed += solve_timer(idx);
         }
         println!("total elapsed time {} µs", elapsed);
     } else if let Result::Ok(idx) = arg.parse::<usize>() {
+        fetch::get_data(2023, idx);
         solve_timer(&idx);
     } else {
         eprintln!("Usage: 'cargo run [day#]' or 'cargo run all'");
