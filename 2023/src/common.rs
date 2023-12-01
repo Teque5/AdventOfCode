@@ -1,5 +1,5 @@
 /// Commonly-used library functions for Advent of Code solutions
-/// Copyright 2021 Alex Utter, 2022 Teque5
+/// Copyright 2021 Alex Utter, 2022-2023 Teque5
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
