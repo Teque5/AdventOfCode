@@ -1,16 +1,74 @@
-#[path = "common.rs"] mod common;
+#[path = "common.rs"]
+mod common;
+
+// fn part1(filename: &str) -> u64 {
+//     let (mut square, dim) = common::read_lines_2d(filename);
+//     let dim = 3usize;
+//     square[(0, 0)] = '7';
+//     for rdx in 0..dim {
+//         for cdx in 0..dim {
+//             // println!("a");
+//             println!("{}", square[(rdx, cdx)]);
+//         }
+//     }
+//     return 1;
+// }
 
 fn part1(filename: &str) -> u64 {
-    let (mut square, dim) = common::read_lines_2d(filename);
-    let dim = 3usize;
-    // square[(0, 0)] = 7;
-    for rdx in 0..dim {
-        for cdx in 0..dim {
-            // println!("a");
-            println!("{}", square[(rdx, cdx)]);
+    let mut acc = 0u64;
+
+    let lines = common::read_lines(filename);
+    for line in lines.iter() {
+        let mut fair_game = true;
+        let mut id = 0u64;
+        let mut position = 0usize;
+        // retrieve the game ID
+        for (idx, c) in line.chars().enumerate() {
+            if let Some(n) = c.to_digit(10) {
+                id = id * 10 + n as u64;
+                position = idx + 2;
+            } else if id > 0 {
+                // non-digit character found
+                break;
+            }
+        }
+        let pulls = line[position..].split(";").collect::<Vec<_>>();
+        for pull in pulls {
+            // for each pull, cannot exceed this quantity
+            let mut red = 12isize;
+            let mut blue = 14isize;
+            let mut green = 13isize;
+            let grabs = pull.split(",").collect::<Vec<_>>();
+            for grab in grabs {
+                let mut val_and_color = grab.trim().split_whitespace();
+                if let Some(number_str) = val_and_color.next() {
+                    if let Ok(number) = number_str.parse::<isize>() {
+                        // println!("Number: {}", number);
+
+                        // The variable 'color' now contains the remaining part of the string
+                        if let Some(color) = val_and_color.next() {
+                            // println!("Color: {}", color);
+                            match color {
+                                "red" => red -= number,
+                                "green" => green -= number,
+                                "blue" => blue -= number,
+                                _ => println!("fuck"),
+                            }
+                        }
+                    }
+                }
+            }
+            if red < 0 || green < 0 || blue < 0 {
+                // println!("{}: {} {} {}", id, red, green, blue);
+                fair_game = false;
+            }
+        }
+        if fair_game {
+            // println!("{}", id);
+            acc += id;
         }
     }
-    return 1;
+    return acc;
 }
 
 // fn part2(filename: &str) -> u64 {
@@ -23,7 +81,7 @@ pub fn solve() {
         part1("input/02_train"),
         common::read_lines_as::<u64>("input/02_val1")[0]
     );
-    // println!("Part1: {}", part1("input/02_test"));
+    println!("Part1: {}", part1("input/02_test"));
 
     // // Test part-2 solver, then apply to real input.
     // assert_eq!(
