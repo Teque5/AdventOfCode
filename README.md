@@ -4,7 +4,7 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 
 ## 2023
 
-Going with rust again, hope I can make it all the way!
+Going with rust again, hope I can make it all the way! This year I am dynamically getting the input from the AoC servers, so we'll need to `export AOC_SESSION=D34DBEEF` before using. Google how to retrieve `AOC_SESSION`.
 
 ## 2022
 
@@ -15,5 +15,6 @@ Using this as an opportunity to learn [rust](https://www.rust-lang.org/). I did 
 ## Dependencies
 
 ```bash
+# 2023+ Requirement
 apt install libssl-dev
 ```

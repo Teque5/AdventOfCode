@@ -4,7 +4,9 @@ use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Result;
+use std::io::Read;
 use std::str::FromStr;
+use ndarray::Array2;
 
 /// Read a file with one String per line.
 #[allow(dead_code)]
@@ -27,6 +29,22 @@ pub fn read_ints(filename: &str) -> Vec<i32> {
         }
     }
     return bla;
+}
+
+/// Read as a 2d vector (if square only for now)
+#[allow(dead_code)]
+pub fn read_lines_2d(filename: &str) -> (Array2<char>, usize) {
+    let mut file = File::open(filename).unwrap();
+    let mut buffer = Vec::new();
+    // read file to bytes
+    println!("yo!");
+    file.read_to_end(&mut buffer).unwrap();
+    // printable characters are above 32
+    buffer.retain(|&x| x > 32);
+    let charbuffer = buffer.iter().map(|b| *b as char).collect::<Vec<_>>();
+    let dim = (buffer.len() as f64).sqrt() as usize;
+    let square = Array2::from_shape_vec((dim, dim), charbuffer).unwrap();
+    return (square, dim);
 }
 
 /// Read a file with one number per line.
