@@ -1,5 +1,4 @@
-#[path = "common.rs"]
-mod common;
+#[path = "common.rs"] mod common;
 
 fn part1(filename: &str) -> u64 {
     let mut acc = 0u64;
