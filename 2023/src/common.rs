@@ -1,6 +1,6 @@
-use ndarray::Array2;
 /// Commonly-used library functions for Advent of Code solutions
 /// Copyright 2021 Alex Utter, 2022-2023 Teque5
+use ndarray::Array2;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
@@ -44,6 +44,26 @@ pub fn read_lines_2d(filename: &str) -> (Array2<char>, usize) {
     let dim = (buffer.len() as f64).sqrt() as usize;
     let square = Array2::from_shape_vec((dim, dim), charbuffer).unwrap();
     return (square, dim);
+}
+
+/// read a rectangular text block as a 2d array of chars
+#[allow(dead_code)]
+pub fn read_2d_chars(filename: &str) -> (Array2<char>, usize, usize) {
+    let mut file = File::open(filename).unwrap();
+    let mut buffer = Vec::new();
+    // read file to bytes
+    file.read_to_end(&mut buffer).unwrap();
+    // 10 is the line feed ascii decimal
+    let cols = match buffer.iter().position(|&c| c == 10) {
+        Some(pos) => pos,
+        None => panic!("no line feed found"),
+    };
+    // printable characters are above 32
+    buffer.retain(|&x| x > 32);
+    let charbuffer = buffer.iter().map(|b| *b as char).collect::<Vec<_>>();
+    let rows = charbuffer.len() / cols;
+    let ray = Array2::from_shape_vec((rows, cols), charbuffer).unwrap();
+    return (ray, rows, cols);
 }
 
 /// Read a file with one number per line.
