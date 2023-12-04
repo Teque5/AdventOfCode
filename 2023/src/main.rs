@@ -13,7 +13,7 @@ mod fetch;
 mod day01;
 mod day02;
 mod day03;
-// mod day04;
+mod day04;
 // mod day05;
 // mod day06;
 // mod day07;
@@ -42,7 +42,7 @@ lazy_static! {
         (1,  day01::solve as fn()),
         (2,  day02::solve as fn()),
         (3,  day03::solve as fn()),
-        // (4,  day04::solve as fn()),
+        (4,  day04::solve as fn()),
         // (5,  day05::solve as fn()),
         // (6,  day06::solve as fn()),
         // (7,  day07::solve as fn()),

@@ -59,9 +59,10 @@ pub fn read_2d_chars(filename: &str) -> (Array2<char>, usize, usize) {
         None => panic!("no line feed found"),
     };
     // printable characters are above 32
-    buffer.retain(|&x| x > 32);
+    buffer.retain(|&x| x >= 32);
     let charbuffer = buffer.iter().map(|b| *b as char).collect::<Vec<_>>();
     let rows = charbuffer.len() / cols;
+    // println!("dbug {} {} {}", rows, cols, charbuffer.len());
     let ray = Array2::from_shape_vec((rows, cols), charbuffer).unwrap();
     return (ray, rows, cols);
 }
