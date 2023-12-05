@@ -89,8 +89,7 @@ pub fn split_str_as<T: FromStr>(line: &str, delim: char) -> Vec<T> {
 /// ignore text and just return single or multi-digit numbers
 #[allow(dead_code)]
 pub fn parse_numbers(line: &str) -> Vec<usize> {
-    line
-        .chars()
+    line.chars()
         .filter(|c| c.is_digit(10) || c.is_whitespace())
         .collect::<String>()
         .split_whitespace()
