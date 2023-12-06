@@ -1,8 +1,8 @@
 #[path = "common.rs"]
 mod common;
+use indicatif::{ProgressBar, ProgressStyle};
 use lru_cache::LruCache;
 use std::collections::HashMap;
-use std::io::{self, Write};
 
 const KEY_SEED_TO_SOIL: u8 = 0;
 const KEY_SOIL_TO_FERTILIZER: u8 = 1;
@@ -82,13 +82,19 @@ fn part(filename: &str, is_part1: bool) -> usize {
     }
 
     // okay now find the path from seed to location
-    let mut count = seeds.len();
+    let count = seeds.len();
     // 1M cache takes about 16G ram
     let cache_size: usize = if is_part1 { 1 << 12 } else { 1 << 20 };
     println!("seeds to locate: {}", count);
+    // fancy progress bar
+    let progress = ProgressBar::new(count as u64);
+    progress.set_style(
+        ProgressStyle::with_template("{bar:40.cyan/blue} {pos:>10}/{len:10} [{eta} left]")
+            .unwrap()
+            .progress_chars("#>-"),
+    );
     let mut cache = LruCache::new(cache_size);
-    for seed in seeds {
-        // println!("seed {}", seed);
+    for (sdx, seed) in seeds.iter().enumerate() {
         let mut next = try_lookup_cache(&lut, &KEY_SEED_TO_SOIL, &seed, &mut cache);
         next = try_lookup_cache(&lut, &KEY_SOIL_TO_FERTILIZER, &next, &mut cache);
         next = try_lookup_cache(&lut, &KEY_FERTILIZER_TO_WATER, &next, &mut cache);
@@ -100,18 +106,11 @@ fn part(filename: &str, is_part1: bool) -> usize {
         if next < lowest {
             lowest = next;
         }
-        if !is_part1 {
-            count -= 1;
-            if count % 10000 == 0 {
-                // prints at 1% progress, about every minute
-                print!("{:12} remaining\r", count);
-                io::stdout().flush().unwrap();
-                if count == 0 {
-                    println!();
-                }
-            }
+        if sdx % 1000 == 0 {
+            progress.set_position(sdx as u64);
         }
     }
+    progress.finish();
     return lowest;
 }
 
