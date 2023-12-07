@@ -89,7 +89,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
     // fancy progress bar
     let progress = ProgressBar::new(count as u64);
     progress.set_style(
-        ProgressStyle::with_template("{bar:40.cyan/blue} {pos:>10}/{len:10} [{eta} left]")
+        ProgressStyle::with_template("{bar:40.cyan/blue} {pos:>10}/{len:10} [{eta} left] {msg}")
             .unwrap()
             .progress_chars("#>-"),
     );
@@ -105,6 +105,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
         // is it the lowest?
         if next < lowest {
             lowest = next;
+            progress.set_message(format!("lowest={}", lowest));
         }
         if sdx % 1000 == 0 {
             progress.set_position(sdx as u64);
