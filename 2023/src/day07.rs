@@ -191,5 +191,5 @@ pub fn solve() {
         common::read_lines_as::<usize>("input/07_val2")[0]
     );
     println!("Part2: {}", part("input/07_test", false));
-    println!("164 minutes");
+    println!("Coded: 164 minutes");
 }

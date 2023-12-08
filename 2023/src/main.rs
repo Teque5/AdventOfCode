@@ -18,7 +18,7 @@ mod day05;
 mod day06;
 mod day07;
 mod day08;
-// mod day09;
+mod day09;
 // mod day10;
 // mod day11;
 // mod day12;
@@ -47,7 +47,7 @@ lazy_static! {
         (6,  day06::solve as fn()),
         (7,  day07::solve as fn()),
         (8,  day08::solve as fn()),
-        // (9,  day09::solve as fn()),
+        (9,  day09::solve as fn()),
         // (10, day10::solve as fn()),
         // (11, day11::solve as fn()),
         // (12, day12::solve as fn()),
@@ -70,15 +70,15 @@ lazy_static! {
 }
 
 /// Wrapper that adds elapsed-time telemetry.
-fn solve_timer(idx: &usize) -> u32 {
-    if let Some(uut) = SOLUTIONS.get(idx) {
+fn solve_timer(idx: &usize) -> usize {
+    if let Some(solver) = SOLUTIONS.get(idx) {
         println!("Starting Day {}", idx);
         let timer = time::Instant::now();
-        uut(); // Run designated function
+        solver(); // Run designated function
         let elapsed = timer.elapsed().as_micros();
         println!("elap: {} µs", elapsed);
         println!("");
-        elapsed as u32
+        elapsed as usize
     } else {
         eprintln!("No solution for Day {}.", idx);
         0
@@ -92,7 +92,7 @@ fn main() {
 
     if arg == "all" {
         // Solve every problem in the list.
-        let mut elapsed = 0u32;
+        let mut elapsed = 0usize;
         let mut keys: Vec<&usize> = SOLUTIONS.keys().collect();
         keys.sort(); // Print in order...
         for idx in keys.iter() {
