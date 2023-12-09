@@ -31,21 +31,6 @@ pub fn read_ints(filename: &str) -> Vec<i32> {
     return bla;
 }
 
-/// Read as a 2d vector (if square only for now)
-#[allow(dead_code)]
-pub fn read_lines_2d(filename: &str) -> (Array2<char>, usize) {
-    let mut file = File::open(filename).unwrap();
-    let mut buffer = Vec::new();
-    // read file to bytes
-    file.read_to_end(&mut buffer).unwrap();
-    // printable characters are above 32
-    buffer.retain(|&x| x > 32);
-    let charbuffer = buffer.iter().map(|b| *b as char).collect::<Vec<_>>();
-    let dim = (buffer.len() as f64).sqrt() as usize;
-    let square = Array2::from_shape_vec((dim, dim), charbuffer).unwrap();
-    return (square, dim);
-}
-
 /// read a rectangular text block as a 2d array of chars
 #[allow(dead_code)]
 pub fn read_2d_chars(filename: &str) -> (Array2<char>, usize, usize) {
@@ -97,6 +82,7 @@ pub fn parse_numbers(line: &str) -> Vec<usize> {
         .collect()
 }
 
+/// same as parse_numbers, but allow negative numbers
 #[allow(dead_code)]
 pub fn parse_numbers_isize(line: &str) -> Vec<isize> {
     line.chars()
@@ -107,7 +93,7 @@ pub fn parse_numbers_isize(line: &str) -> Vec<isize> {
         .collect()
 }
 
-/// Parse a string's numeric components.
+/// Parse a string's numeric components; ignore all spaces and other chars
 #[allow(dead_code)]
 pub fn split_numeric(line: &str) -> Vec<u64> {
     let mut temp: Option<u64> = None;
@@ -121,18 +107,4 @@ pub fn split_numeric(line: &str) -> Vec<u64> {
         }
     }
     return result;
-}
-
-/// Print a labelled list of items.
-#[allow(dead_code)]
-pub fn print_list<T: std::fmt::Display>(lbl: &str, iter: impl Iterator<Item = T>) {
-    print!("{}: [", lbl);
-    for (n, x) in iter.enumerate() {
-        if n == 0 {
-            print!("{}", x);
-        } else {
-            print!(", {}", x);
-        }
-    }
-    println!("]");
 }
