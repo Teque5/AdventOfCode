@@ -97,6 +97,16 @@ pub fn parse_numbers(line: &str) -> Vec<usize> {
         .collect()
 }
 
+#[allow(dead_code)]
+pub fn parse_numbers_isize(line: &str) -> Vec<isize> {
+    line.chars()
+        .filter(|c| c.is_digit(10) || c.is_whitespace() || *c == '-')
+        .collect::<String>()
+        .split_whitespace()
+        .filter_map(|s| s.parse().ok())
+        .collect()
+}
+
 /// Parse a string's numeric components.
 #[allow(dead_code)]
 pub fn split_numeric(line: &str) -> Vec<u64> {
