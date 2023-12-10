@@ -1,6 +1,7 @@
 /// Top-level dispatcher for Advent Of Code 2023 solutions
-/// See also: https://adventofcode.com/2023/
+/// https://adventofcode.com/
 /// To run a given day's solution: cargo run [day#]
+/// To run all day's solutions: cargo run all
 
 #[macro_use]
 extern crate lazy_static;
@@ -19,7 +20,7 @@ mod day06;
 mod day07;
 mod day08;
 mod day09;
-// mod day10;
+mod day10;
 // mod day11;
 // mod day12;
 // mod day13;
@@ -36,7 +37,7 @@ mod day09;
 // mod day24;
 // mod day25;
 
-// List of functions, one for each day's problem.
+// List of functions, one for each day's problem
 lazy_static! {
     static ref SOLUTIONS: HashMap<usize, fn()> = vec![
         (1,  day01::solve as fn()),
@@ -48,7 +49,7 @@ lazy_static! {
         (7,  day07::solve as fn()),
         (8,  day08::solve as fn()),
         (9,  day09::solve as fn()),
-        // (10, day10::solve as fn()),
+        (10, day10::solve as fn()),
         // (11, day11::solve as fn()),
         // (12, day12::solve as fn()),
         // (13, day13::solve as fn()),
