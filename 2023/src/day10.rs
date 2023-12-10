@@ -1,5 +1,6 @@
 #[path = "common.rs"]
 mod common;
+use ndarray::s;
 use ndarray::Array2;
 
 fn check_prev(
@@ -65,7 +66,6 @@ fn possible_step(
         let possible = (pos.0, pos.1 - 1);
         if possible != pos_prev {
             if ['-', 'F', 'L'].contains(&tiles[possible]) {
-                println!("l");
                 return possible;
             }
         }
@@ -75,7 +75,6 @@ fn possible_step(
         let possible = (pos.0 - 1, pos.1);
         if possible != pos_prev {
             if ['|', '7', 'F'].contains(&tiles[possible]) {
-                println!("t");
                 return possible;
             }
         }
@@ -85,7 +84,6 @@ fn possible_step(
         let possible = (pos.0, pos.1 + 1);
         if possible != pos_prev {
             if ['-', '7', 'J'].contains(&tiles[possible]) {
-                println!("r");
                 return possible;
             }
         }
@@ -95,7 +93,6 @@ fn possible_step(
         let possible = (pos.0 + 1, pos.1);
         if possible != pos_prev {
             if ['|', 'J', 'L'].contains(&tiles[possible]) {
-                println!("b");
                 return possible;
             }
         }
@@ -103,9 +100,8 @@ fn possible_step(
     return (0, 0);
 }
 
-fn part(filename: &str, is_part1: bool) -> usize {
-
-
+/// hot springs pipes
+fn part1(filename: &str) -> usize {
     // parse info
     let (tiles, rows, cols) = common::read_2d_chars(filename);
 
@@ -119,44 +115,136 @@ fn part(filename: &str, is_part1: bool) -> usize {
         }
     }
     let pos_start = pos.clone();
-    println!("0 {:?}", pos_start);
+    // println!("0 {:?}", pos_start);
     let mut pos_prev = pos_start.clone();
     // look around until we find the pipe
     pos = possible_step(&tiles, rows, cols, pos, pos_prev);
     let mut acc = 1usize;
-    println!("1 {:?}", pos);
+    // println!("1 {:?}", pos);
 
     loop {
         let next_pos = step(&tiles, rows, cols, pos, pos_prev);
         pos_prev = pos;
         pos = next_pos;
         acc += 1;
-        println!("{} {:?}", acc, pos);
+        // println!("{} {:?}", acc, pos);
         if pos == pos_start {
             break;
         }
-        // if acc > 10 {
-        //     break;
-        // }
     }
 
     return acc / 2;
+}
+
+// scrub to find inner/outer
+fn scrub(containment: &mut Array2<char>, rows: usize, cols: usize) {
+    for rdx in 0..rows {
+        for cdx in 0..cols {
+            // println!("going? {} {}", rdx, cdx);
+            let pos = (rdx, cdx);
+            if containment[pos] == '.' {
+                // println!("d");
+                if (pos.1 == 0) || (pos.0 == 0) || (pos.0 == rows - 1) || (pos.1 == cols - 1) {
+                    // on edge
+                    containment[pos] = 'o';
+                    // println!("e{}", containment[pos])
+                } else {
+                    let trbl = vec![
+                        containment[(rdx - 1, cdx)],
+                        containment[(rdx, cdx + 1)],
+                        containment[(rdx + 1, cdx)],
+                        containment[(rdx, cdx - 1)],
+                    ];
+                    // println!("{:?}", trbl);
+                    for char in trbl {
+                        if char == 'o' {
+                            containment[pos] = 'o';
+                            // println!("o{}", containment[pos])
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return;
+}
+
+/// hot springs pipes
+fn part2(filename: &str) -> usize {
+    // parse info
+    let (tiles, rows, cols) = common::read_2d_chars(filename);
+    let mut containment = Array2::from_elem((rows, cols), '.');
+
+    // find s_position
+    let mut pos = (0usize, 0usize);
+    for rdx in 0..rows {
+        for cdx in 0..cols {
+            if tiles[(rdx, cdx)] == 'S' {
+                pos = (rdx, cdx);
+            }
+        }
+    }
+    let pos_start = pos.clone();
+    // println!("0 {:?}", pos_start);
+    containment[pos_start] = 'x';
+    let mut pos_prev = pos_start.clone();
+    // look around until we find the pipe
+    pos = possible_step(&tiles, rows, cols, pos, pos_prev);
+    containment[pos] = 'x';
+
+    // println!("1 {:?}", pos);
+
+    loop {
+        let next_pos = step(&tiles, rows, cols, pos, pos_prev);
+        pos_prev = pos;
+        pos = next_pos;
+        containment[pos] = 'x';
+        // println!("{} {:?}", 8, pos);
+        if pos == pos_start {
+            break;
+        }
+    }
+    // let is_contained = false;
+    for _ in 0..100 {
+        scrub(&mut containment, rows, cols);
+    }
+
+    println!("dbug {} {}", rows, cols);
+    let mut acc = 0usize;
+    for rdx in 0..rows {
+        for cdx in 0..cols {
+            if containment[(rdx, cdx)] == '.' {
+                acc += 1;
+            }
+        }
+    }
+    for rdx in 0..rows {
+        let some_string: String = containment.slice(s![rdx, ..]).into_iter().collect();
+        println!("{:}", some_string)
+    }
+    // 558 is too high
+    return acc;
 }
 
 pub fn solve() {
     let day: usize = 10;
     // Test part-1 solver, then apply to real input.
     assert_eq!(
-        part(&format!("input/{:02}_train", day), true),
+        part1(&format!("input/{:02}_train1", day)),
         common::read_lines_as::<usize>(&format!("input/{:02}_val1", day))[0]
     );
-    println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
+    println!("Part1: {}", part1(&format!("input/{:02}_test", day)));
 
-    // // Test part-2 solver, then apply to real input.
+    // Test part-2 solver, then apply to real input.
     // assert_eq!(
-    //     part(&format!("input/{:02}_train", day), false),
-    //     common::read_lines_as::<isize>(&format!("input/{:02}_val2", day))[0]
+    //     part2(&format!("input/{:02}_train2", day)),
+    //     common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
     // );
-    // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+    // assert_eq!(
+    //     part2(&format!("input/{:02}_train3", day)),
+    //     common::read_lines_as::<usize>(&format!("input/{:02}_val3", day))[0]
+    // );
+    println!("Part2: {}", part2(&format!("input/{:02}_test", day)));
     // println!("Coded: xxx minutes");
 }
