@@ -1,8 +1,8 @@
 #[path = "common.rs"]
 mod common;
-use ndarray::s;
 use ndarray::Array2;
 
+/// given two positions and a previous, return only the new one
 fn check_prev(
     pos_poss: ((usize, usize), (usize, usize)),
     pos_prev: (usize, usize),
@@ -14,13 +14,8 @@ fn check_prev(
     }
 }
 
-fn step(
-    tiles: &Array2<char>,
-    rows: usize,
-    cols: usize,
-    pos: (usize, usize),
-    pos_prev: (usize, usize),
-) -> (usize, usize) {
+/// return the next position, given current and prior
+fn step(tiles: &Array2<char>, pos: (usize, usize), pos_prev: (usize, usize)) -> (usize, usize) {
     let this_char = tiles[pos];
     match this_char {
         '|' => {
@@ -49,9 +44,6 @@ fn step(
         }
         _ => panic!("not possible {}", this_char),
     }
-
-    // the program should never get here
-    // return (0, 0);
 }
 
 fn possible_step(
@@ -123,7 +115,7 @@ fn part1(filename: &str) -> usize {
     // println!("1 {:?}", pos);
 
     loop {
-        let next_pos = step(&tiles, rows, cols, pos, pos_prev);
+        let next_pos = step(&tiles, pos, pos_prev);
         pos_prev = pos;
         pos = next_pos;
         acc += 1;
@@ -136,30 +128,30 @@ fn part1(filename: &str) -> usize {
     return acc / 2;
 }
 
-// scrub to find inner/outer
-fn scrub(containment: &mut Array2<char>, rows: usize, cols: usize) {
+/// waterfill to find inner/outer
+fn waterfill(containment: &mut Array2<char>, rows: usize, cols: usize) -> bool {
+    // set filled if any pixels were filled
+    let mut filled = false;
     for rdx in 0..rows {
         for cdx in 0..cols {
-            // println!("going? {} {}", rdx, cdx);
             let pos = (rdx, cdx);
             if containment[pos] == '.' {
-                // println!("d");
                 if (pos.1 == 0) || (pos.0 == 0) || (pos.0 == rows - 1) || (pos.1 == cols - 1) {
                     // on edge
                     containment[pos] = 'o';
-                    // println!("e{}", containment[pos])
+                    filled = true;
                 } else {
+                    // TOP RIGHT BOTTOM LEFT
                     let trbl = vec![
                         containment[(rdx - 1, cdx)],
                         containment[(rdx, cdx + 1)],
                         containment[(rdx + 1, cdx)],
                         containment[(rdx, cdx - 1)],
                     ];
-                    // println!("{:?}", trbl);
                     for char in trbl {
                         if char == 'o' {
                             containment[pos] = 'o';
-                            // println!("o{}", containment[pos])
+                            filled = true;
                         }
                     }
                 }
@@ -167,14 +159,53 @@ fn scrub(containment: &mut Array2<char>, rows: usize, cols: usize) {
         }
     }
 
-    return;
+    return filled;
 }
 
-/// hot springs pipes
+/// fill out interpolated containment
+fn mark_contained(tiles: &Array2<char>, containment: &mut Array2<char>, pos: (usize, usize)) {
+    containment[(pos.0 * 3 + 1, pos.1 * 3 + 1)] = 'x';
+    match tiles[pos] {
+        'S' => {
+            containment[(pos.0 * 3, pos.1 * 3 + 1)] = 'x';
+            containment[(pos.0 * 3 + 1, pos.1 * 3)] = 'x';
+            containment[(pos.0 * 3 + 1, pos.1 * 3 + 1)] = 'x';
+            containment[(pos.0 * 3 + 1, pos.1 * 3 + 2)] = 'x';
+            containment[(pos.0 * 3 + 2, pos.1 * 3 + 1)] = 'x';
+        }
+        'J' => {
+            containment[(pos.0 * 3, pos.1 * 3 + 1)] = 'x';
+            containment[(pos.0 * 3 + 1, pos.1 * 3)] = 'x';
+        }
+        'L' => {
+            containment[(pos.0 * 3, pos.1 * 3 + 1)] = 'x';
+            containment[(pos.0 * 3 + 1, pos.1 * 3 + 2)] = 'x';
+        }
+        'F' => {
+            containment[(pos.0 * 3 + 1, pos.1 * 3 + 2)] = 'x';
+            containment[(pos.0 * 3 + 2, pos.1 * 3 + 1)] = 'x';
+        }
+        '7' => {
+            containment[(pos.0 * 3 + 1, pos.1 * 3)] = 'x';
+            containment[(pos.0 * 3 + 2, pos.1 * 3 + 1)] = 'x';
+        }
+        '-' => {
+            containment[(pos.0 * 3 + 1, pos.1 * 3)] = 'x';
+            containment[(pos.0 * 3 + 1, pos.1 * 3 + 2)] = 'x';
+        }
+        '|' => {
+            containment[(pos.0 * 3, pos.1 * 3 + 1)] = 'x';
+            containment[(pos.0 * 3 + 2, pos.1 * 3 + 1)] = 'x';
+        }
+        _ => panic!("not possible {}", tiles[pos]),
+    }
+}
+
+/// hot springs pipes, but now interpolated by 3x
 fn part2(filename: &str) -> usize {
     // parse info
     let (tiles, rows, cols) = common::read_2d_chars(filename);
-    let mut containment = Array2::from_elem((rows, cols), '.');
+    let mut containment = Array2::from_elem((rows * 3, cols * 3), '.');
 
     // find s_position
     let mut pos = (0usize, 0usize);
@@ -185,45 +216,47 @@ fn part2(filename: &str) -> usize {
             }
         }
     }
+    mark_contained(&tiles, &mut containment, pos);
     let pos_start = pos.clone();
-    // println!("0 {:?}", pos_start);
-    containment[pos_start] = 'x';
+
     let mut pos_prev = pos_start.clone();
     // look around until we find the pipe
     pos = possible_step(&tiles, rows, cols, pos, pos_prev);
-    containment[pos] = 'x';
-
-    // println!("1 {:?}", pos);
+    mark_contained(&tiles, &mut containment, pos);
 
     loop {
-        let next_pos = step(&tiles, rows, cols, pos, pos_prev);
+        let next_pos = step(&tiles, pos, pos_prev);
+
         pos_prev = pos;
         pos = next_pos;
-        containment[pos] = 'x';
-        // println!("{} {:?}", 8, pos);
+
+        mark_contained(&tiles, &mut containment, pos);
+
         if pos == pos_start {
             break;
         }
     }
-    // let is_contained = false;
-    for _ in 0..100 {
-        scrub(&mut containment, rows, cols);
+
+    let mut filled = true;
+    while filled {
+        // keep calling this until waterfill is complete
+        filled = waterfill(&mut containment, rows * 3, cols * 3);
     }
 
-    println!("dbug {} {}", rows, cols);
+    // for rdx in 0..rows*3 {
+    //     let some_string: String = containment.slice(s![rdx, ..]).into_iter().collect();
+    //     println!("{:}", some_string)
+    // }
+
+    // count the center points
     let mut acc = 0usize;
     for rdx in 0..rows {
         for cdx in 0..cols {
-            if containment[(rdx, cdx)] == '.' {
+            if containment[(rdx * 3 + 1, cdx * 3 + 1)] == '.' {
                 acc += 1;
             }
         }
     }
-    for rdx in 0..rows {
-        let some_string: String = containment.slice(s![rdx, ..]).into_iter().collect();
-        println!("{:}", some_string)
-    }
-    // 558 is too high
     return acc;
 }
 
@@ -237,14 +270,14 @@ pub fn solve() {
     println!("Part1: {}", part1(&format!("input/{:02}_test", day)));
 
     // Test part-2 solver, then apply to real input.
-    // assert_eq!(
-    //     part2(&format!("input/{:02}_train2", day)),
-    //     common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    // );
-    // assert_eq!(
-    //     part2(&format!("input/{:02}_train3", day)),
-    //     common::read_lines_as::<usize>(&format!("input/{:02}_val3", day))[0]
-    // );
+    assert_eq!(
+        part2(&format!("input/{:02}_train2", day)),
+        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
+    );
+    assert_eq!(
+        part2(&format!("input/{:02}_train3", day)),
+        common::read_lines_as::<usize>(&format!("input/{:02}_val3", day))[0]
+    );
     println!("Part2: {}", part2(&format!("input/{:02}_test", day)));
     // println!("Coded: xxx minutes");
 }
