@@ -1,6 +1,6 @@
 /// Commonly-used library functions for Advent of Code solutions
 /// Copyright 2021 Alex Utter, 2022-2023 Teque5
-use ndarray::Array2;
+use ndarray::{Array2, Axis};
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
@@ -50,6 +50,15 @@ pub fn read_2d_chars(filename: &str) -> (Array2<char>, usize, usize) {
     // println!("dbug {} {} {}", rows, cols, charbuffer.len());
     let ray = Array2::from_shape_vec((rows, cols), charbuffer).unwrap();
     return (ray, rows, cols);
+}
+
+// given a 2d array of chars, print the whole thing as a block
+#[allow(dead_code)]
+pub fn print_2d_chars(ray: &Array2<char>) {
+    for row in ray.axis_iter(Axis(0)) {
+        let some_string: String = row.into_iter().collect();
+        println!("{:}", some_string);
+    }
 }
 
 /// Read a file with one number per line.

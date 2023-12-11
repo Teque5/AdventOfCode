@@ -3,6 +3,7 @@ mod common;
 use num_integer::lcm;
 use std::collections::HashMap;
 
+/// Navigate the Network
 fn part1(filename: &str) -> usize {
     let mut path: Vec<usize> = Vec::new();
     let mut routes: HashMap<String, (String, String)> = HashMap::new();

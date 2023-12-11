@@ -3,6 +3,7 @@ mod common;
 use ndarray::Array2;
 use std::cmp;
 
+/// Gear Ratios
 fn part1(filename: &str) -> usize {
     let mut acc = 0usize;
     let (ray, rows, cols) = common::read_2d_chars(filename);
@@ -74,6 +75,7 @@ fn eat(ray: &Array2<char>, rdx: usize, cdx: usize) -> usize {
     return value;
 }
 
+/// Gear Ratios *
 fn part2(filename: &str) -> usize {
     let mut acc = 0usize;
     let (ray, rows, cols) = common::read_2d_chars(filename);

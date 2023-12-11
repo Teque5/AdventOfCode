@@ -137,7 +137,7 @@ fn waterfill(containment: &mut Array2<char>, rows: usize, cols: usize) -> bool {
             let pos = (rdx, cdx);
             if containment[pos] == '.' {
                 if (pos.1 == 0) || (pos.0 == 0) || (pos.0 == rows - 1) || (pos.1 == cols - 1) {
-                    // on edge
+                    // we are on the edge
                     containment[pos] = 'o';
                     filled = true;
                 } else {
@@ -149,6 +149,7 @@ fn waterfill(containment: &mut Array2<char>, rows: usize, cols: usize) -> bool {
                         containment[(rdx, cdx - 1)],
                     ];
                     for char in trbl {
+                        // adjacent is outside
                         if char == 'o' {
                             containment[pos] = 'o';
                             filled = true;
@@ -243,10 +244,7 @@ fn part2(filename: &str) -> usize {
         filled = waterfill(&mut containment, rows * 3, cols * 3);
     }
 
-    // for rdx in 0..rows*3 {
-    //     let some_string: String = containment.slice(s![rdx, ..]).into_iter().collect();
-    //     println!("{:}", some_string)
-    // }
+    // common::print_2d_chars(&containment);
 
     // count the center points
     let mut acc = 0usize;
