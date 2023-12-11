@@ -1,8 +1,10 @@
 #[path = "common.rs"]
 mod common;
 use indicatif::{ProgressBar, ProgressStyle};
-use lru_cache::LruCache;
+use rayon::prelude::*;
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{Arc, Mutex};
 
 const KEY_SEED_TO_SOIL: u8 = 0;
 const KEY_SOIL_TO_FERTILIZER: u8 = 1;
@@ -12,18 +14,7 @@ const KEY_LIGHT_TO_TEMPERATURE: u8 = 4;
 const KEY_TEMPERATURE_TO_HUMIDITY: u8 = 5;
 const KEY_HUMIDITY_TO_LOCATION: u8 = 6;
 
-fn try_lookup_cache(
-    lut: &HashMap<u8, Vec<Vec<usize>>>,
-    key: &u8,
-    alpha: &usize,
-    cache: &mut LruCache<(u8, usize), usize>,
-) -> usize {
-    if cache.contains_key(&(*key, *alpha)) {
-        if let Some(result) = cache.get_mut(&(*key, *alpha)) {
-            // if it's in the cache, we are already done.
-            return *result;
-        }
-    }
+fn try_lookup_cache(lut: &HashMap<u8, Vec<Vec<usize>>>, key: &u8, alpha: &usize) -> usize {
     for map in lut[key].iter() {
         // destination range start, source range start, range length
         if (map[1]..(map[1] + map[2])).contains(alpha) {
@@ -37,7 +28,6 @@ fn try_lookup_cache(
 
 /// Food Production Problem
 fn part(filename: &str, is_part1: bool) -> usize {
-    let mut lowest = usize::MAX;
     let mut lut: HashMap<u8, Vec<Vec<usize>>> = HashMap::new();
     let mut seeds: Vec<usize> = Vec::new();
     let mut key = 7u8;
@@ -84,8 +74,6 @@ fn part(filename: &str, is_part1: bool) -> usize {
 
     // okay now find the path from seed to location
     let count = seeds.len();
-    // 1M cache takes about 16G ram
-    let cache_size: usize = if is_part1 { 1 << 12 } else { 1 << 20 };
     println!("seeds to locate: {}", count);
     // fancy progress bar
     let progress = ProgressBar::new(count as u64);
@@ -94,26 +82,30 @@ fn part(filename: &str, is_part1: bool) -> usize {
             .unwrap()
             .progress_chars("#>-"),
     );
-    let mut cache = LruCache::new(cache_size);
-    for (sdx, seed) in seeds.iter().enumerate() {
-        let mut next = try_lookup_cache(&lut, &KEY_SEED_TO_SOIL, &seed, &mut cache);
-        next = try_lookup_cache(&lut, &KEY_SOIL_TO_FERTILIZER, &next, &mut cache);
-        next = try_lookup_cache(&lut, &KEY_FERTILIZER_TO_WATER, &next, &mut cache);
-        next = try_lookup_cache(&lut, &KEY_WATER_TO_LIGHT, &next, &mut cache);
-        next = try_lookup_cache(&lut, &KEY_LIGHT_TO_TEMPERATURE, &next, &mut cache);
-        next = try_lookup_cache(&lut, &KEY_TEMPERATURE_TO_HUMIDITY, &next, &mut cache);
-        next = try_lookup_cache(&lut, &KEY_HUMIDITY_TO_LOCATION, &next, &mut cache);
+    // variables we will access inside the parallel loop
+    let lowest = Arc::new(Mutex::new(usize::MAX));
+    let sdx = Arc::new(AtomicU64::new(0));
+    // parallelized iterator w/rayon
+    seeds.par_iter().for_each(|seed| {
+        let mut next = try_lookup_cache(&lut, &KEY_SEED_TO_SOIL, &seed);
+        next = try_lookup_cache(&lut, &KEY_SOIL_TO_FERTILIZER, &next);
+        next = try_lookup_cache(&lut, &KEY_FERTILIZER_TO_WATER, &next);
+        next = try_lookup_cache(&lut, &KEY_WATER_TO_LIGHT, &next);
+        next = try_lookup_cache(&lut, &KEY_LIGHT_TO_TEMPERATURE, &next);
+        next = try_lookup_cache(&lut, &KEY_TEMPERATURE_TO_HUMIDITY, &next);
+        next = try_lookup_cache(&lut, &KEY_HUMIDITY_TO_LOCATION, &next);
         // is it the lowest?
-        if next < lowest {
-            lowest = next;
-            progress.set_message(format!("lowest={}", lowest));
+        if next < *lowest.lock().unwrap() {
+            *lowest.lock().unwrap() = next;
+            progress.set_message(format!("lowest={}", lowest.lock().unwrap()));
         }
-        if sdx % 1000 == 0 {
-            progress.set_position(sdx as u64);
+        let current_sdx = sdx.fetch_add(1, Ordering::SeqCst);
+        if current_sdx % 100 == 0 {
+            progress.set_position(current_sdx);
         }
-    }
+    });
     progress.finish();
-    return lowest;
+    return lowest.lock().unwrap().clone();
 }
 
 pub fn solve() {
