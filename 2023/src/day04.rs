@@ -2,6 +2,7 @@
 mod common;
 use ndarray::Array2;
 
+/// Scratchcards
 fn part1(filename: &str) -> usize {
     let mut acc = 0usize;
     let (ray, rows, cols) = common::read_2d_chars(filename);

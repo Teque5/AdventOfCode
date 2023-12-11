@@ -2,6 +2,7 @@
 mod common;
 use std::cmp;
 
+/// Cube Conundrum
 fn part1(filename: &str) -> usize {
     let mut acc = 0usize;
 
@@ -55,6 +56,7 @@ fn part1(filename: &str) -> usize {
     return acc;
 }
 
+/// Determine fewest cubes possible for game to be valid
 fn part2(filename: &str) -> isize {
     let mut acc = 0isize;
 

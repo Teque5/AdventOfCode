@@ -1,5 +1,7 @@
-#[path = "common.rs"] mod common;
+#[path = "common.rs"]
+mod common;
 
+/// Trebuchet
 fn part1(filename: &str) -> u64 {
     let mut acc = 0u64;
 
@@ -23,7 +25,7 @@ fn part1(filename: &str) -> u64 {
     return acc;
 }
 
-// This time we will first replace the words with numbers
+/// This time we will first replace the words with numbers
 fn part2(filename: &str) -> u64 {
     let mut acc = 0u64;
     let lines = common::read_lines(filename);

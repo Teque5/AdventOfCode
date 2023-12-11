@@ -35,6 +35,7 @@ fn try_lookup_cache(
     return *alpha;
 }
 
+/// Food Production Problem
 fn part(filename: &str, is_part1: bool) -> usize {
     let mut lowest = usize::MAX;
     let mut lut: HashMap<u8, Vec<Vec<usize>>> = HashMap::new();

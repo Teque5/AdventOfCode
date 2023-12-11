@@ -37,7 +37,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
     }
 
     // create universe expanded 2d vector
-    // println!("new {:?} from {:?}", (rows + newrdx.len(), cols + newcdx.len()), (rows, cols));
+    // turns out this wasn't necessary to solve the puzzle
     // let mut expanded = Array2::from_elem((rows + newrdx.len(), cols + newcdx.len()), '.');
     let mut galaxy_positions: Vec<(usize, usize)> = Vec::new();
     let mut r_extra = 0;
@@ -61,7 +61,6 @@ fn part(filename: &str, is_part1: bool) -> usize {
 
             if universe[(rdx, cdx)] == '#' {
                 let pos = (rdx + r_extra, cdx + c_extra);
-                // println!("{:?} {}", pos, universe[(rdx, cdx)]);
                 // expanded[pos] = universe[(rdx, cdx)];
                 galaxy_positions.push(pos);
             }
@@ -75,11 +74,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
         acc += (pos1.1 as i32 - pos2.1 as i32).abs() as usize;
     }
 
-    // for rdx in 0..(rows+newrdx.len()) {
-
-    //     let some_string: String = expanded.slice(s![rdx, ..]).into_iter().collect();
-    //     println!("{:}", some_string);
-    // }
+    // common::print_2d_chars(&universe);
 
     return acc;
 }
@@ -94,7 +89,7 @@ fn combinations<T: Clone>(items: Vec<T>) -> Vec<(T, T)> {
         }
     }
 
-    combinations
+    return combinations;
 }
 
 pub fn solve() {
