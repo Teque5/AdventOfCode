@@ -1,16 +1,16 @@
 #[path = "common.rs"]
 mod common;
+use rayon::prelude::*;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// are these char vectors equal?
 fn are_equal(alpha: &Vec<char>, omega: &Vec<char>) -> bool {
-    let mut is_equal = true;
     for idx in 0..alpha.len() {
-        if (alpha[(idx)] != omega[(idx)]) && ('?' != omega[(idx)]) {
-            // println!("{} {}", alpha[(idx)], omega[(idx)]);
-            is_equal = false;
+        if (alpha[idx] != omega[idx]) && ('?' != omega[idx]) {
+            return false;
         }
     }
-    return is_equal;
+    return true;
 }
 
 fn generate_combinations(
@@ -44,25 +44,45 @@ fn generate_combinations(
 // Broken Hot Springs
 fn part(filename: &str, is_part1: bool) -> usize {
     let mut arrangements = 0usize;
+    let arrangements = AtomicUsize::new(0);
     // let all_groups: Vec<Vec<usize>> = Vec::new();
     // let all_records: Vec<Vec<char>> = Vec::new();
     // parse info
     let lines = common::read_lines(filename);
-    for line in lines {
+    lines.par_iter().for_each(|line| {
+    // for line in lines {
         let mut record_and_groups = line.split_whitespace();
-        let record = record_and_groups
+        let mut record = record_and_groups
             .next()
             .unwrap()
             .chars()
             .collect::<Vec<_>>();
-        let groups = common::split_str_as::<usize>(record_and_groups.next().unwrap(), ',');
+        let mut groups = common::split_str_as::<usize>(record_and_groups.next().unwrap(), ',');
+
+
+        if !is_part1 {
+            // 5x everything; insert extra ? between records
+            let mut new_groups: Vec<usize> = Vec::new();
+            let mut new_record: Vec<char> = Vec::new();
+            for _ in 0..5 {
+                new_groups.extend(groups.clone());
+                new_record.extend(record.clone());
+                new_record.push('?');
+            }
+            record = new_record;
+            groups = new_groups;
+
+            // println!("x {:?}", record.clone().into_iter().collect::<String>());
+            // println!("x {:?}", groups);
+        }
+
         // determine possible arrangements
         let min_len = groups.iter().sum::<usize>() + groups.len() - 1;
-        if min_len == record.len() {
-            // only 1 possible arrangement; isn't likely to occur
-            arrangements += 1;
-            continue;
-        }
+        // if min_len == record.len() {
+        //     // only 1 possible arrangement; isn't likely to occur
+        //     arrangements += 1;
+        //     continue;
+        // }
 
         // construct a possibility and then fuck with it
         let mut possible: Vec<char> = Vec::new();
@@ -82,6 +102,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
             &mut all_combinations,
             0,
         );
+        println!("combocalcok");
         for combo in all_combinations.iter() {
             possible.clear();
 
@@ -104,14 +125,14 @@ fn part(filename: &str, is_part1: bool) -> usize {
                 possible.extend(vec!['.'; combo[groups.len()]]);
             }
             let is_ok = are_equal(&possible, &record);
-            println!(
-                "{:?} {:?} {}",
-                combo,
-                possible.clone().into_iter().collect::<String>(),
-                is_ok
-            );
             if is_ok {
-                arrangements += 1;
+                arrangements.fetch_add(1, Ordering::Relaxed);
+                println!(
+                    "{:?} {:?} {}",
+                    combo,
+                    possible.clone().into_iter().collect::<String>(),
+                    is_ok
+                );
             }
         }
 
@@ -123,10 +144,9 @@ fn part(filename: &str, is_part1: bool) -> usize {
         //     record.into_iter().collect::<String>(),
         //     possible.into_iter().collect::<String>(),
         // );
-        // if groups.iter.sum()
-    }
+    });
 
-    return arrangements;
+    return arrangements.load(Ordering::Relaxed);
 }
 
 pub fn solve() {
@@ -138,11 +158,11 @@ pub fn solve() {
     );
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    // // Test part-2 solver, then apply to real input.
-    // assert_eq!(
-    //     part(&format!("input/{:02}_train", day), false),
-    //     common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    // );
+    // Test part-2 solver, then apply to real input.
+    assert_eq!(
+        part(&format!("input/{:02}_train", day), false),
+        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
+    );
     // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
-    // println!("Coded: xxx minutes");
+    // println!("Coded: 120+ minutes");
 }
