@@ -24,7 +24,7 @@ mod day10;
 mod day11;
 mod day12;
 mod day13;
-// mod day14;
+mod day14;
 // mod day15;
 // mod day16;
 // mod day17;
@@ -53,7 +53,7 @@ lazy_static! {
         (11, day11::solve as fn()),
         (12, day12::solve as fn()),
         (13, day13::solve as fn()),
-        // (14, day14::solve as fn()),
+        (14, day14::solve as fn()),
         // (15, day15::solve as fn()),
         // (16, day16::solve as fn()),
         // (17, day17::solve as fn()),
