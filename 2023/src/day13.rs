@@ -29,7 +29,6 @@ fn part(filename: &str, is_part1: bool) -> usize {
     // process remainder block
     acc += process_block(&current_block, is_part1);
 
-    // 20779 is too low
     return acc;
 }
 
