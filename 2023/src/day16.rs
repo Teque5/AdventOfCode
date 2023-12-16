@@ -1,8 +1,9 @@
 #[path = "common.rs"]
 mod common;
+use ndarray::Array2;
 use std::collections::HashMap;
-use ndarray::{Array2, Axis};
 
+/// recursively spawn the next step of the beam
 fn follow_beam(
     grid: &Array2<char>,
     energized: &mut Array2<bool>,
@@ -16,12 +17,10 @@ fn follow_beam(
     // note these max values are due to possible overflow
     if laser_row == usize::MAX || laser_row == rows {
         // out of bounds left/right, laser ends
-        // println!("quit edge");
         return;
     }
     if laser_col == usize::MAX || laser_col == cols {
         // out of bounds top/bottom, laser ends
-        // println!("quit edge");
         return;
     }
     if cache.contains_key(&(laser_row, laser_col, laser_dir)) {
@@ -33,14 +32,7 @@ fn follow_beam(
     // energize this position
     energized[(laser_row, laser_col)] = true;
 
-    // println!("");
-    // for row in energized.axis_iter(Axis(0)) {
-    //     let some_string: String = row.iter().map(|&b| if b {'#'} else {'.'}).collect();
-    //     println!("{:}", some_string);
-    // }
-
     let grid_char = grid[(laser_row, laser_col)];
-    // println!("{} {} ({}, {})", laser_dir, grid_char, laser_row, laser_col);
     // determine how the laser moves next
     match laser_dir {
         '🡲' | '🡰' => {
@@ -92,7 +84,6 @@ fn follow_beam(
                         }
                         _ => panic!("no!"),
                     }
-
                 }
                 '-' => {
                     //split
@@ -106,23 +97,74 @@ fn follow_beam(
     }
 }
 
-fn part(filename: &str, is_part1: bool) -> usize {
-    // started 2243 finish 2357
+/// before each run, need to reset the energizer map
+fn reset(
+    energized: &mut Array2<bool>,
+    cache: &mut HashMap<(usize, usize, char), ()>,
+    rows: usize,
+    cols: usize,
+) {
+    cache.clear();
+    *energized = Array2::from_elem((rows, cols), false);
+}
 
+/// Beam Splitter
+fn part(filename: &str, is_part1: bool) -> usize {
     // parse info
-    // let lines = common::read_lines(filename);
     let (grid, rows, cols) = common::read_2d_chars(filename);
     let mut energized: Array2<bool> = Array2::from_elem((rows, cols), false);
     let mut cache: HashMap<(usize, usize, char), ()> = HashMap::new();
-    follow_beam(&grid, &mut energized, &mut cache, rows, cols, 0, 0, '🡲');
-    println!("");
-    for row in energized.axis_iter(Axis(0)) {
-        let some_string: String = row.iter().map(|&b| if b {'#'} else {'.'}).collect();
-        println!("{:}", some_string);
+    if is_part1 {
+        follow_beam(&grid, &mut energized, &mut cache, rows, cols, 0, 0, '🡲');
+        // for row in energized.axis_iter(Axis(0)) {
+        //     let some_string: String = row.iter().map(|&b| if b {'#'} else {'.'}).collect();
+        //     println!("{:}", some_string);
+        // }
+        // count true values in energized
+        let energized_spaces = energized.iter().filter(|&&x| x).count();
+        return energized_spaces;
     }
-    // count true values in energized
-    let energized_spaces = energized.iter().filter(|&&x| x).count();
-    return energized_spaces;
+    // part2 starts here
+    let mut best = (0usize, 0usize, 0usize);
+    let mut energized: Array2<bool> = Array2::from_elem((rows, cols), false);
+
+    // top row
+    for cdx in 0..cols {
+        reset(&mut energized, &mut cache, rows, cols);
+        follow_beam(&grid, &mut energized, &mut cache, rows, cols, 0, cdx, '🡳');
+        let energized_spaces = energized.iter().filter(|&&x| x).count();
+        if energized_spaces > best.0 {
+            best = (energized_spaces, 0, cdx);
+        }
+    }
+    // bottom row
+    for cdx in 0..cols {
+        reset(&mut energized, &mut cache, rows, cols);
+        follow_beam(&grid, &mut energized, &mut cache, rows, cols, rows-1, cdx, '🡱');
+        let energized_spaces = energized.iter().filter(|&&x| x).count();
+        if energized_spaces > best.0 {
+            best = (energized_spaces, rows - 1, cdx);
+        }
+    }
+    // left col
+    for rdx in 0..rows {
+        reset(&mut energized, &mut cache, rows, cols);
+        follow_beam(&grid, &mut energized, &mut cache, rows, cols, rdx, 0, '🡲');
+        let energized_spaces = energized.iter().filter(|&&x| x).count();
+        if energized_spaces > best.0 {
+            best = (energized_spaces, rdx, 0);
+        }
+    }
+    // right col
+    for rdx in 0..rows {
+        reset(&mut energized, &mut cache, rows, cols);
+        follow_beam(&grid, &mut energized, &mut cache, rows, cols, rdx, cols-1, '🡰');
+        let energized_spaces = energized.iter().filter(|&&x| x).count();
+        if energized_spaces > best.0 {
+            best = (energized_spaces, rdx, cols - 1);
+        }
+    }
+    return best.0;
 }
 
 pub fn solve() {
@@ -134,11 +176,11 @@ pub fn solve() {
     );
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    //     // Test part-2 solver, then apply to real input.
-    //     assert_eq!(
-    //         part(&format!("input/{:02}_train", day), false),
-    //         common::read_lines_as::<isize>(&format!("input/{:02}_val2", day))[0]
-    //     );
-    //     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
-    //     println!("Coded: 74+ minutes");
+    // Test part-2 solver, then apply to real input.
+    assert_eq!(
+        part(&format!("input/{:02}_train", day), false),
+        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
+    );
+    println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+    println!("Coded: 94 minutes");
 }
