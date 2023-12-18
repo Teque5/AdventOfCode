@@ -4,7 +4,7 @@ mod common;
 // use petgraph::graph::{DiGraph, NodeIndex};
 // use petgraph::algo::dijkstra;
 use indicatif::{ProgressBar, ProgressStyle};
-use rand::distributions::{Distribution, Uniform};
+use rand::distributions::Uniform;
 use rand::Rng;
 // use std::collections::HashSet;
 
