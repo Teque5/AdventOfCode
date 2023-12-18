@@ -6,40 +6,23 @@ mod common;
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::distributions::{Distribution, Uniform};
 use rand::Rng;
-use std::collections::HashSet;
-use std::hash::{Hash, Hasher};
-
-fn step(direction: u8, some_loc: (usize, usize)) -> (usize, usize) {
-    let mut next_loc: (usize, usize) = (0, 0);
-    match direction {
-        // down
-        0 => next_loc = (some_loc.0 + 1, some_loc.1),
-        // up
-        1 => next_loc = (some_loc.0.wrapping_sub(1), some_loc.1),
-        // right
-        2 => next_loc = (some_loc.0, some_loc.1 + 1),
-        // left
-        3 => next_loc = (some_loc.0, some_loc.1.wrapping_sub(1)),
-        _ => panic!("not possible"),
-    }
-    return next_loc;
-}
-
-// Function to hash a vector
-fn hash_vector(vector: &[u8]) -> usize {
-    let mut hasher = std::collections::hash_map::DefaultHasher::new();
-    vector.hash(&mut hasher);
-    hasher.finish() as usize
-}
+// use std::collections::HashSet;
 
 fn sigmoid(x: f64) -> f64 {
     1.0 / (1.0 + (-x).exp())
 }
 
-/// Crucible
+/// Heat Loss Path Finding
 fn part(filename: &str, is_part1: bool) -> usize {
+    // The problem with my naive implementation is that it works for the
+    // training data after a while, but the test grid is so huge that I can't even
+    // find the start->end in a path at all, likely due to the many checks that
+    // cause a loop to break if the move is invalid. Nothing is pulling the path
+    // down to that bottom right corner. perhaps a better approach would be to start
+    // with a straight line, then perturb it to lower the loss.
+
     let mut rng = rand::thread_rng();
-    let die = Uniform::from(0..=3);
+    // let die = Uniform::from(0..=3);
     let zoom = Uniform::new(0.0, 1.0);
     // parse info
     let (grid, rows, cols) = common::read_2d_chars(filename);
@@ -47,7 +30,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
 
     // navigate the path
     let mut best: (usize, Vec<u8>) = (usize::MAX, Vec::new());
-    let max_steps: usize = 100_000_000;
+    let max_steps: usize = 10_000_000;
 
     // progress bar
     let progress = ProgressBar::new(max_steps as u64);
@@ -71,9 +54,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
         // randomly fast forward on best path, do this much more during higher steps
         // the divisor controls distribution
         let probability = sigmoid((sss as f64) / ((max_steps as f64) / 2.));
-        // if sss % 1000 == 0 {
-        //     println!("p {} {:.3}", sss, probability);
-        // }
+
         let rand_01: f64 = rng.sample(zoom);
         let do_fast_forward = rand_01 < probability;
         // do_fast_forward = rng.gen_range(0, 2);
@@ -83,7 +64,15 @@ fn part(filename: &str, is_part1: bool) -> usize {
             // println!("ff {}", fast_forward_count);
             for fdx in 0..fast_forward_count {
                 let direction: u8 = best.1[fdx];
-                next_loc = step(direction, this_loc);
+                // when we are fast-forwarding we can skip all checks
+                let possibles: Vec<(usize, usize)> = vec![
+                    (this_loc.0 + 1, this_loc.1),
+                    (this_loc.0.wrapping_sub(1), this_loc.1),
+                    (this_loc.0, this_loc.1 + 1),
+                    (this_loc.0, this_loc.1.wrapping_sub(1)),
+                ];
+                next_loc = possibles[direction as usize];
+
                 // this is our next step
                 prev_loc = this_loc;
                 this_loc = next_loc;
@@ -94,26 +83,45 @@ fn part(filename: &str, is_part1: bool) -> usize {
             }
         }
         loop {
-            let direction: u8 = die.sample(&mut rng);
-            let next_loc = step(direction, this_loc);
-            if next_loc == prev_loc || next_loc.0 == usize::MAX || next_loc.1 == usize::MAX {
-                // cannot move like this
-                continue;
-            }
-            if next_loc.0 == rows || next_loc.1 == cols {
-                // cannot move outside grid
-                continue;
-            }
-            if path.len() >= 3 {
-                if path[path.len() - 3..].iter().all(|&x| x == direction) {
-                    // cannot move in a straight line more than three spaces
-                    continue;
+            let possibles: Vec<(usize, usize)> = vec![
+                (this_loc.0 + 1, this_loc.1),             // down
+                (this_loc.0.wrapping_sub(1), this_loc.1), // up
+                (this_loc.0, this_loc.1 + 1),
+                (this_loc.0, this_loc.1.wrapping_sub(1)),
+            ];
+            let mut possible_pdxs: Vec<u8> = Vec::new();
+            for (pdx, possible) in possibles.iter().enumerate() {
+                let mut is_okay = true;
+                if path_locs.contains(&possible) {
+                    // prior position
+                    is_okay = false;
+                }
+                if possible == &prev_loc || possible.0 == usize::MAX || possible.1 == usize::MAX {
+                    // cannot move like this
+                    is_okay = false;
+                }
+                if possible.0 == rows || possible.1 == cols {
+                    // cannot move outside grid
+                    is_okay = false;
+                }
+                if path.len() >= 3 {
+                    if path[path.len() - 3..].iter().all(|&x| x == pdx as u8) {
+                        // cannot move in a straight line more than three spaces
+                        is_okay = false;
+                    }
+                }
+                if is_okay {
+                    possible_pdxs.push(pdx as u8);
                 }
             }
-            if path_locs.contains(&next_loc) {
-                // no crossing over self
+            if possible_pdxs.len() == 0 {
+                // no step from the current position is allowed
                 break;
             }
+            let ppdx: usize = rng.gen_range(0..possible_pdxs.len());
+
+            let (direction, next_loc) =
+                (possible_pdxs[ppdx], possibles[possible_pdxs[ppdx] as usize]);
             // this is our next step
             prev_loc = this_loc;
             this_loc = next_loc;
@@ -186,5 +194,5 @@ pub fn solve() {
     //     common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
     // );
     // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
-    // println!("Coded: xxx minutes");
+    // println!("Coded: 120+ minutes");
 }
