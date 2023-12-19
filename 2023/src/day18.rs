@@ -3,6 +3,7 @@ mod common;
 use ndarray::Array2;
 
 /// Dig Plan
+#[allow(unused_assignments)]
 fn part(filename: &str, is_part1: bool) -> isize {
     let mut gridsize_neg = (0isize, 0isize);
     let mut gridsize_pos = (0isize, 0isize);
