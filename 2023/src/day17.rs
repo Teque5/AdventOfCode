@@ -13,6 +13,8 @@ fn sigmoid(x: f64) -> f64 {
 }
 
 /// Heat Loss Path Finding
+#[allow(unused_assignments)]
+#[allow(unused_variables)] // remove when part2 working
 fn part(filename: &str, is_part1: bool) -> usize {
     // The problem with my naive implementation is that it works for the
     // training data after a while, but the test grid is so huge that I can't even
