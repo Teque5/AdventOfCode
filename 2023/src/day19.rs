@@ -2,6 +2,7 @@
 mod common;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Part {
@@ -91,28 +92,92 @@ fn part(filename: &str, is_part1: bool) -> usize {
             }
         }
     }
-    for (key, value) in &rules {
-        // println!("{:?} {:?}", key, value);
-    }
+    // for (key, value) in &rules {
+    //     println!("{:?} {:?}", key, value);
+    // }
     // actually parse all the parts with the rules
-    let mut acc = 0usize;
-    for some_part in parts {
-        // println!("{:?}", some_part);
-        let is_in_a = workflow(&rules, &some_part, "in".to_string());
-        if is_in_a {
-            acc += some_part.x;
-            acc += some_part.m;
-            acc += some_part.a;
-            acc += some_part.s;
+    if is_part1 {
+        // part 1
+        let mut acc = 0usize;
+        for some_part in parts {
+            // println!("{:?}", some_part);
+            let is_in_a = workflow(&rules, &some_part, &"in".to_string());
+            if is_in_a {
+                acc += some_part.x;
+                acc += some_part.m;
+                acc += some_part.a;
+                acc += some_part.s;
+            }
+        }
+        return acc;
+    } else {
+        // part 2, check combinations backwards kinda
+        // FIXME: I believe the issue is that I was assuming there is a good set of values for all rules, but actually for each A destination there is a separate set of good values
+        let mut good = GoodValues {
+            x: HashSet::new(),
+            m: HashSet::new(),
+            a: HashSet::new(),
+            s: HashSet::new(),
+        };
+        work_backward(&mut good, &rules, &"A".to_string());
+        println!("{} {} {} {}", good.x.len(), good.m.len(), good.a.len(), good.s.len());
+        return good.x.len() * good.m.len() * good.a.len() * good.s.len();
+    }
+
+}
+
+struct GoodValues {
+    x: HashSet<usize>,
+    m: HashSet<usize>,
+    a: HashSet<usize>,
+    s: HashSet<usize>,
+}
+
+fn work_backward(good: &mut GoodValues, rules: &HashMap<String, Vec<MiniRule>>, some_loc: &String) {
+    let mut dummy_set = HashSet::new();
+    for (loc, some_rules) in rules {
+        for minirule in some_rules {
+            if &minirule.dest == some_loc {
+                println!("{:?}", minirule);
+                let some_set: &mut HashSet<usize> = match minirule.a {
+                    'x' => &mut good.x,
+                    'm' => &mut good.m,
+                    'a' => &mut good.a,
+                    's' => &mut good.s,
+                    ' ' => &mut dummy_set,
+                    _ => panic!("not possible"),
+                };
+                match minirule.cmp {
+                    '>' => {
+                        for quant in 1..=4000 {
+                            if quant > minirule.val {
+                                some_set.insert(quant);
+                            }
+                        }
+                    }
+                    '<' => {
+                        for quant in 1..=4000 {
+                            if quant < minirule.val {
+                                some_set.insert(quant);
+                            }
+                        }
+                    }
+                    '.' => {
+                        // this is the else condition
+                        for quant in 1..=4000 {
+                            some_set.insert(quant);
+                        }
+                    }
+                    _ => panic!("not possible"),
+                }
+            }
         }
     }
-    return acc;
 }
 
 /// process workflow at some destination
-fn workflow(rules: &HashMap<String, Vec<MiniRule>>, some_part: &Part, loc: String) -> bool {
-    let some_rules = &rules[&loc];
-    for minirule in some_rules {
+fn workflow(rules: &HashMap<String, Vec<MiniRule>>, some_part: &Part, loc: &String) -> bool {
+    for minirule in &rules[loc] {
         let quantity: usize = match minirule.a {
             'x' => some_part.x,
             'm' => some_part.m,
@@ -129,7 +194,7 @@ fn workflow(rules: &HashMap<String, Vec<MiniRule>>, some_part: &Part, loc: Strin
                     } else if minirule.dest == "R" {
                         return false;
                     } else {
-                        return workflow(rules, some_part, minirule.dest.clone());
+                        return workflow(rules, some_part, &minirule.dest);
                     }
                 }
             }
@@ -140,7 +205,7 @@ fn workflow(rules: &HashMap<String, Vec<MiniRule>>, some_part: &Part, loc: Strin
                     } else if minirule.dest == "R" {
                         return false;
                     } else {
-                        return workflow(rules, some_part, minirule.dest.clone());
+                        return workflow(rules, some_part, &minirule.dest);
                     }
                 }
             }
@@ -151,7 +216,7 @@ fn workflow(rules: &HashMap<String, Vec<MiniRule>>, some_part: &Part, loc: Strin
                 } else if minirule.dest == "R" {
                     return false;
                 } else {
-                    return workflow(rules, some_part, minirule.dest.clone());
+                    return workflow(rules, some_part, &minirule.dest);
                 }
             }
             _ => panic!("not possible"),
@@ -170,10 +235,10 @@ pub fn solve() {
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
     // Test part-2 solver, then apply to real input.
-    // assert_eq!(
-    //     part(&format!("input/{:02}_train", day), false),
-    //     common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    // );
+    assert_eq!(
+        part(&format!("input/{:02}_train", day), false),
+        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
+    );
     // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
     // println!("Coded: xxx minutes");
 }
