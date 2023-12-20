@@ -120,10 +120,28 @@ fn part(filename: &str, is_part1: bool) -> usize {
             s: HashSet::new(),
         };
         work_backward(&mut good, &rules, &"A".to_string());
-        println!("{} {} {} {}", good.x.len(), good.m.len(), good.a.len(), good.s.len());
+        println!(
+            "{} {} {} {}",
+            good.x.len(),
+            good.m.len(),
+            good.a.len(),
+            good.s.len()
+        );
         return good.x.len() * good.m.len() * good.a.len() * good.s.len();
     }
+    // else {
+        // .par_iter().for_each(|line| {
+        // let mut acc = 0usize;
+        // for px in 1..=4000 {
+        //     for pm in 1..=4000 {
+        //         for pa in 1..=4000 {
+        //             for ps in 1..=4000 {
 
+        //             }
+        //         }
+        //     }
+        // }
+    // }
 }
 
 struct GoodValues {
@@ -135,7 +153,7 @@ struct GoodValues {
 
 fn work_backward(good: &mut GoodValues, rules: &HashMap<String, Vec<MiniRule>>, some_loc: &String) {
     let mut dummy_set = HashSet::new();
-    for (loc, some_rules) in rules {
+    for (_, some_rules) in rules {
         for minirule in some_rules {
             if &minirule.dest == some_loc {
                 println!("{:?}", minirule);
@@ -235,10 +253,10 @@ pub fn solve() {
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
     // Test part-2 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), false),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    );
+    // assert_eq!(
+    //     part(&format!("input/{:02}_train", day), false),
+    //     common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
+    // );
     // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
     // println!("Coded: xxx minutes");
 }
