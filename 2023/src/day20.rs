@@ -147,15 +147,17 @@ fn part(filename: &str, is_part1: bool) -> usize {
             }
         }
         for (key, value) in &lut {
-            println!("{:>30} {:>4} {:>4}", key, value.lo_count, value.hi_count);
+            // println!("{:>30} {:>4} {:>4}", key, value.lo_count, value.hi_count);
             hi_count += value.hi_count;
             lo_count += value.lo_count;
         }
         return hi_count * lo_count;
     } else {
-        // part 2
+        // part 2: stop pressing the button when a single low pulse is sent to "rx"
+        // gh leads to rx and is a conjunction node, so the several inputs to gh all need to be
+        let mut rx_found = false;
         let mut presses = 0usize;
-        loop {
+        while !rx_found {
             presses += 1;
             let bla = lut.get_mut("broadcaster").unwrap().eat(
                 "null".to_string(),
@@ -165,23 +167,25 @@ fn part(filename: &str, is_part1: bool) -> usize {
             fifo.extend(bla);
             while let Some((src, dst, pulse)) = fifo.pop_front() {
                 // for each module, eat pulse waiting in fifo if module exists
-                // eat(destination, &mut fifo, &mut lut)
-                // println!("pop {} {} {}", src, dst, pulse);
-                // println!("{:?}",lut.keys());
-                if lut.contains_key(&dst) {
-                    let bla = lut.get_mut(&dst).unwrap().eat(src, dst.clone(), pulse);
-                    fifo.extend(bla);
-                }
                 if dst == "rx" && pulse == false {
                     println!("found! {}", presses);
-                    break;
+                    rx_found = true;
+                }
+                if lut.contains_key(&dst) {
+                    let bla = lut.get_mut(&dst).unwrap().eat(src.clone(), dst.clone(), pulse);
+                    fifo.extend(bla);
                 }
             }
             if presses % 1_000_000 == 0 {
-                println!("{}e6 MPresses", (presses as f32) / 1e6);
+                println!("{}e6 Presses", (presses as f32) / 1e6);
             }
+        //     if presses > 3730 {
+        //         println!("finish");
+        //     }
         }
         println!("found after {} presses", presses);
+        // higher than 3734
+        return presses
     }
 }
 
