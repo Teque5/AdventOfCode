@@ -2,6 +2,10 @@
 
 This is repository holds my solutions to the [Advent of Code](https://adventofcode.com/) puzzles.
 
+## 2024
+
+Rustaceans assemble!
+
 ## 2023
 
 Going with rust again, hope I can make it all the way! This year I am dynamically getting the input from the AoC servers, so we'll need to `export AOC_SESSION=D34DBEEF` before using. Google how to retrieve `AOC_SESSION`.
