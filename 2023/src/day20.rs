@@ -83,7 +83,11 @@ impl Module {
     }
 }
 
+/// Pulse Propagation through Conjunction & Flip-Flop Modules
 fn part(filename: &str, is_part1: bool) -> usize {
+    // note to self for part2 if I want to solve this faster:
+    // find the LCM between the bits toggling going into the last inverter
+
     // parse info
     let mut lut: HashMap<String, Module> = HashMap::new();
     let lines = common::read_lines(filename);
