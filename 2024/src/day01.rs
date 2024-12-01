@@ -1,80 +1,57 @@
 #[path = "common.rs"]
 mod common;
 
-/// Trebuchet
-// fn part1(filename: &str) -> u64 {
-//     let mut acc = 0u64;
+/// List Distance
+fn part(filename: &str, is_part1: bool) -> usize {
+    let mut acc = 0usize;
+    let mut left: Vec<isize> = Vec::new();
+    let mut right: Vec<isize> = Vec::new();
 
-//     let lines = common::read_lines(filename);
-//     for line in lines.iter() {
-//         // get all numbers in each line
-//         let items = common::split_numeric(line);
-//         let mut alpha = 0u64;
-//         let mut omega = 0u64;
-//         for &val in items.iter() {
-//             if alpha == 0 {
-//                 // set to first found number
-//                 alpha = val;
-//             }
-//             // set to last found number
-//             omega = val;
-//         }
-//         // println!("endrow {}{}", alpha, omega);
-//         acc += alpha * 10 + omega
-//     }
-//     return acc;
-// }
-
-// /// This time we will first replace the words with numbers
-// fn part2(filename: &str) -> u64 {
-//     let mut acc = 0u64;
-//     let lines = common::read_lines(filename);
-//     for line in lines.iter() {
-//         // get all numbers in each line
-//         // due to some trickyness I keep the first and last letters of
-//         // each number in this replace since they can overlap with adjacent
-//         let cleanline = line
-//             .replace("one", "o1e")
-//             .replace("two", "t2o")
-//             .replace("three", "t3e")
-//             .replace("four", "f4r")
-//             .replace("five", "f5e")
-//             .replace("six", "s6x")
-//             .replace("seven", "s7n")
-//             .replace("eight", "e8t")
-//             .replace("nine", "n9e");
-//         let items = common::split_numeric(&cleanline);
-//         let mut alpha = 0u64;
-//         let mut omega = 0u64;
-//         for &val in items.iter() {
-//             if alpha == 0 {
-//                 // set to first found number
-//                 alpha = val;
-//             }
-//             // set to last found number
-//             omega = val;
-//         }
-//         // println!("endrow {}{}", alpha, omega);
-//         acc += alpha * 10 + omega
-//     }
-//     return acc;
-// }
+    // parse info
+    let lines = common::read_lines(filename);
+    for line in lines {
+        let row = common::parse_numbers_isize(&line);
+        left.push(row[0] as isize);
+        right.push(row[1] as isize);
+    }
+    if is_part1 {
+        // between left and right, sum distances between lists
+        // sort lists
+        left.sort();
+        right.sort();
+        // sum up distances
+        for idx in 0..left.len() {
+            acc += (left[idx] - right[idx]).abs() as usize;
+          }
+    } else {
+        // count how many times left number appears in right list; do multiply later
+        for &lval in left.iter() {
+            let mut subcount = 0usize;
+            for &rval in right.iter() {
+                if lval == rval {
+                    subcount += 1;
+                }
+            }
+            acc += subcount * (lval as usize);
+        }
+    }
+    return acc;
+}
 
 pub fn solve() {
     let day: usize = 1;
-    println!("{}", day)
     // Test part-1 solver, then apply to real input.
-    // assert_eq!(
-    //     part(&format!("input/{:02}_train", day), true),
-    //     common::read_lines_as::<usize>(&format!("input/{:02}_val1", day))[0]
-    // );
-    // println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
+    assert_eq!(
+        part(&format!("input/{:02}_train", day), true),
+        common::read_lines_as::<usize>(&format!("input/{:02}_val1", day))[0]
+    );
+    println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
     // Test part-2 solver, then apply to real input.
-    // assert_eq!(
-    //     part(&format!("input/{:02}_train", day), false),
-    //     common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    // );
-    // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
-    // println!("Coded: xxx minutes");
+    assert_eq!(
+        part(&format!("input/{:02}_train", day), false),
+        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
+    );
+    println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+    println!("Coded: 45 minutes");
 }
