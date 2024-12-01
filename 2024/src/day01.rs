@@ -10,7 +10,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
     // parse info
     let lines = common::read_lines(filename);
     for line in lines {
-        let row = common::parse_numbers_isize(&line);
+        let row = common::parse_numbers(&line);
         left.push(row[0] as isize);
         right.push(row[1] as isize);
     }
@@ -22,7 +22,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
         // sum up distances
         for idx in 0..left.len() {
             acc += (left[idx] - right[idx]).abs() as usize;
-          }
+        }
     } else {
         // count how many times left number appears in right list; do multiply later
         for &lval in left.iter() {

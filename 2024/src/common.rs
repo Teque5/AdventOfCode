@@ -8,7 +8,7 @@ use std::io::Read;
 use std::io::Result;
 use std::str::FromStr;
 
-/// Read a file with one String per line.
+/// read a file into a vector of strings
 #[allow(dead_code)]
 pub fn read_lines(filename: &str) -> Vec<String> {
     let file = File::open(filename).unwrap();
@@ -16,22 +16,18 @@ pub fn read_lines(filename: &str) -> Vec<String> {
     lines.filter_map(Result::ok).collect()
 }
 
-/// Read a file with one number per line. Return -1 if not parsable.
+/// read a file with one number per line
 #[allow(dead_code)]
-pub fn read_ints(filename: &str) -> Vec<i32> {
+pub fn read_lines_as<T: FromStr>(filename: &str) -> Vec<T> {
     let file = File::open(filename).unwrap();
     let lines = BufReader::new(file).lines();
-    let mut bla = Vec::new();
-    for line_result in lines {
-        match str::parse::<i32>(&line_result.unwrap()) {
-            Ok(okay) => bla.push(okay),
-            Err(_) => bla.push(-1i32),
-        }
-    }
-    return bla;
+    lines
+        .filter_map(Result::ok)
+        .filter_map(|line| line.trim().parse::<T>().ok())
+        .collect()
 }
 
-/// read a rectangular text block as a 2d array of chars
+/// read a file with rectangular text block as a 2d array of chars
 #[allow(dead_code)]
 pub fn read_2d_chars(filename: &str) -> (Array2<char>, usize, usize) {
     let mut file = File::open(filename).unwrap();
@@ -52,7 +48,7 @@ pub fn read_2d_chars(filename: &str) -> (Array2<char>, usize, usize) {
     return (ray, rows, cols);
 }
 
-// given a 2d array of chars, print the whole thing as a block
+// print whole 2d array of chars
 #[allow(dead_code)]
 pub fn print_2d_chars(ray: &Array2<char>) {
     for row in ray.axis_iter(Axis(0)) {
@@ -61,59 +57,21 @@ pub fn print_2d_chars(ray: &Array2<char>) {
     }
 }
 
-/// Read a file with one number per line.
+/// parse character-delimited string as vector
 #[allow(dead_code)]
-pub fn read_lines_as<T: FromStr>(filename: &str) -> Vec<T> {
-    let file = File::open(filename).unwrap();
-    let lines = BufReader::new(file).lines();
-    lines
-        .filter_map(Result::ok)
-        .filter_map(|line| line.trim().parse::<T>().ok())
-        .collect()
-}
-
-/// Parse character-delimited string as Vec<T>
-#[allow(dead_code)]
-pub fn split_str_as<T: FromStr>(line: &str, delim: char) -> Vec<T> {
+pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
     line.split(delim)
         .filter_map(|x| x.parse::<T>().ok())
         .collect()
 }
 
-/// ignore text and just return single or multi-digit numbers
+/// parse string, ignore text, and return +/- single or multi-digit numbers
 #[allow(dead_code)]
-pub fn parse_numbers(line: &str) -> Vec<usize> {
-    line.chars()
-        .filter(|c| c.is_digit(10) || c.is_whitespace())
-        .collect::<String>()
-        .split_whitespace()
-        .filter_map(|s| s.parse().ok())
-        .collect()
-}
-
-/// same as parse_numbers, but allow negative numbers
-#[allow(dead_code)]
-pub fn parse_numbers_isize(line: &str) -> Vec<isize> {
+pub fn parse_numbers(line: &str) -> Vec<isize> {
     line.chars()
         .filter(|c| c.is_digit(10) || c.is_whitespace() || *c == '-')
         .collect::<String>()
         .split_whitespace()
         .filter_map(|s| s.parse().ok())
         .collect()
-}
-
-/// Parse a string's numeric components; ignore all spaces and other chars
-#[allow(dead_code)]
-pub fn split_numeric(line: &str) -> Vec<u64> {
-    let mut temp: Option<u64> = None;
-    let mut result: Vec<u64> = Vec::new();
-    for c in line.chars() {
-        if let Some(n) = c.to_digit(10) {
-            temp = Some(n as u64);
-        }
-        if let Some(n) = temp {
-            result.push(n);
-        }
-    }
-    return result;
 }
