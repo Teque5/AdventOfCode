@@ -24,6 +24,7 @@ struct Part {
     s: usize,
 }
 // then later
+let json_line: &str = "{x=787,m=2655,a=1222,s=2876}";
 let some_part: Part = serde_json::from_str(&json_line).unwrap();
 // and it adds the debug print so you can
 println!("{:?}", some_part)
