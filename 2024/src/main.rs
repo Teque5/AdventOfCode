@@ -17,7 +17,7 @@ mod day03;
 mod day04;
 mod day05;
 mod day06;
-// mod day07;
+mod day07;
 // mod day08;
 // mod day09;
 // mod day10;
@@ -46,7 +46,7 @@ lazy_static! {
         (4,  day04::solve as fn()),
         (5,  day05::solve as fn()),
         (6,  day06::solve as fn()),
-        // (7,  day07::solve as fn()),
+        (7,  day07::solve as fn()),
         // (8,  day08::solve as fn()),
         // (9,  day09::solve as fn()),
         // (10, day10::solve as fn()),
@@ -88,6 +88,7 @@ fn solve_timer(idx: &usize) -> usize {
 
 /// Main entry point looks at command-line arguments.
 fn main() {
+    let year: usize = 2024;
     let args: Vec<String> = env::args().collect();
     let arg = args.last().unwrap_or(&EMPTY_STRING);
 
@@ -97,12 +98,17 @@ fn main() {
         let mut keys: Vec<&usize> = SOLUTIONS.keys().collect();
         keys.sort(); // Print in order...
         for idx in keys.iter() {
-            fetch::get_data(2024, **idx);
+            fetch::get_data(year, **idx);
             elapsed += solve_timer(idx);
         }
-        println!("total elapsed time {} µs", elapsed);
+
+        println!(
+            "Advent of Code {} Runtime = {:.3} s",
+            year,
+            elapsed as f32 / 1e6
+        );
     } else if let Result::Ok(idx) = arg.parse::<usize>() {
-        fetch::get_data(2024, idx);
+        fetch::get_data(year, idx);
         solve_timer(&idx);
     } else {
         eprintln!("Usage: 'cargo run [day#]' or 'cargo run all'");
