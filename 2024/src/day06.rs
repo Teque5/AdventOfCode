@@ -86,10 +86,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
     let mut walked: Array3<bool> = Array3::from_elem((rows, cols, 4), false);
     // fancy progress bar
     let progress = ProgressBar::new((rows * cols) as u64);
-    progress.set_style(
-        ProgressStyle::with_template("{bar:40.cyan/blue} {pos:>9}/{len:9} [{eta} left] {msg}")
-            .unwrap(),
-    );
+    progress.set_style(ProgressStyle::with_template(common::STYLE).unwrap());
     progress.set_message("Simulating Obstacles");
     // add obstruction
     for rdx in 0..rows {
