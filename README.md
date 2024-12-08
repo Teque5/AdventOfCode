@@ -2,15 +2,25 @@
 
 This is repository holds my solutions to the [Advent of Code](https://adventofcode.com/) puzzles.
 
-## 2024
+## Using
 
-Rustaceans assemble!
+1. `export AOC_SESSION=D34DBEEF` before running to get input dynamically from AoC server. [How to get session cookie.](https://github.com/wimglenn/advent-of-code-wim/issues/1)
+2. `cargo run 4` runs just `Day04.rs`
+3. `cargo run all` runs all days
+4. `cargo run --release all` for fastest benchmark
 
-## 2023
+## Annual Thoughts
 
-Going with rust again! This year I am dynamically getting the input from the AoC servers, so we'll need to `export AOC_SESSION=D34DBEEF` before using. [How to get session cookie.](https://github.com/wimglenn/advent-of-code-wim/issues/1)
+* **2024**: Rustaceans assemble! Focusing on faster solutions this year.
+* **2023**: Going with rust again!
+* **2022**: Using this as an opportunity to learn [rust](https://www.rust-lang.org/). I did use python on some of the puzzles where I was racing against colleagues. :D
 
-### Best Crates
+## Visualizations
+
+### 2022 Day15
+![day15](2022/img/day15.webp)
+
+## Most Useful Crates
 
 #### Serde
 
@@ -68,9 +78,3 @@ let final_acc = acc.load(Ordering::Relaxed);
 # 2023+ Requirement
 apt install libssl-dev
 ```
-
-## 2022
-
-Using this as an opportunity to learn [rust](https://www.rust-lang.org/). I did use python on some of the puzzles where I was racing against colleagues. :D
-
-![day15](2022/img/day15.webp)
