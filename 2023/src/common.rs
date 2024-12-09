@@ -8,6 +8,10 @@ use std::io::Read;
 use std::io::Result;
 use std::str::FromStr;
 
+/// Style string used for all progress bars
+#[allow(dead_code)]
+pub const STYLE: &str = "{bar:40.cyan/blue} {pos:>9}/{len:9} [{eta} left] {msg}";
+
 /// Read a file with one String per line.
 #[allow(dead_code)]
 pub fn read_lines(filename: &str) -> Vec<String> {

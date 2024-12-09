@@ -74,14 +74,10 @@ fn part(filename: &str, is_part1: bool) -> usize {
 
     // okay now find the path from seed to location
     let count = seeds.len();
-    println!("seeds to locate: {}", count);
+    // println!("seeds to locate: {}", count);
     // fancy progress bar
     let progress = ProgressBar::new(count as u64);
-    progress.set_style(
-        ProgressStyle::with_template("{bar:40.cyan/blue} {pos:>10}/{len:10} [{eta} left] {msg}")
-            .unwrap()
-            .progress_chars("#>-"),
-    );
+    progress.set_style(ProgressStyle::with_template(common::STYLE).unwrap());
     // variables we will access inside the parallel loop
     let lowest = Arc::new(Mutex::new(usize::MAX));
     let sdx = Arc::new(AtomicU64::new(0));
@@ -104,7 +100,6 @@ fn part(filename: &str, is_part1: bool) -> usize {
             progress.set_position(current_sdx);
         }
     });
-    progress.finish();
     return lowest.lock().unwrap().clone();
 }
 

@@ -88,7 +88,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
     let mut power = 0usize;
     for (bdx, bbox) in boxes.iter().enumerate() {
         for (sdx, (_, focus)) in bbox.iter().enumerate() {
-            power += (bdx+1) * (sdx+1) * focus;
+            power += (bdx + 1) * (sdx + 1) * focus;
         }
     }
     return power;
