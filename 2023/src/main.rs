@@ -73,11 +73,11 @@ lazy_static! {
 /// Wrapper that adds elapsed-time telemetry.
 fn solve_timer(idx: &usize) -> usize {
     if let Some(solver) = SOLUTIONS.get(idx) {
-        println!("Starting Day {}", idx);
+        println!("Day {}", idx);
         let timer = time::Instant::now();
         solver(); // Run designated function
         let elapsed = timer.elapsed().as_micros();
-        println!("elap: {} µs", elapsed);
+        println!("Timed: {} µs", elapsed);
         println!("");
         elapsed as usize
     } else {
@@ -88,6 +88,7 @@ fn solve_timer(idx: &usize) -> usize {
 
 /// Main entry point looks at command-line arguments.
 fn main() {
+    let year: usize = 2024;
     let args: Vec<String> = env::args().collect();
     let arg = args.last().unwrap_or(&EMPTY_STRING);
 
@@ -97,12 +98,17 @@ fn main() {
         let mut keys: Vec<&usize> = SOLUTIONS.keys().collect();
         keys.sort(); // Print in order...
         for idx in keys.iter() {
-            fetch::get_data(2023, **idx);
+            fetch::get_data(year, **idx);
             elapsed += solve_timer(idx);
         }
-        println!("total elapsed time {} µs", elapsed);
+
+        println!(
+            "Advent of Code {} Runtime = {:.3} s",
+            year,
+            elapsed as f32 / 1e6
+        );
     } else if let Result::Ok(idx) = arg.parse::<usize>() {
-        fetch::get_data(2023, idx);
+        fetch::get_data(year, idx);
         solve_timer(&idx);
     } else {
         eprintln!("Usage: 'cargo run [day#]' or 'cargo run all'");

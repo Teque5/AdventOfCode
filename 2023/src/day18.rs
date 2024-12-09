@@ -24,17 +24,16 @@ fn part(filename: &str, is_part1: bool) -> isize {
             amounts.push(amount);
         } else {
             let rawhex: Vec<char> = line_split.nth(2).unwrap().chars().collect();
-            match rawhex.get(rawhex.len()-2).unwrap() {
+            match rawhex.get(rawhex.len() - 2).unwrap() {
                 '0' => direction = 'R',
                 '1' => direction = 'D',
                 '2' => direction = 'L',
                 '3' => direction = 'U',
                 _ => panic!("no"),
             }
-            let hexstr: String = rawhex[2..rawhex.len()-2].iter().collect();
+            let hexstr: String = rawhex[2..rawhex.len() - 2].iter().collect();
             amount = usize::from_str_radix(&hexstr, 16).unwrap();
             println!("{:?} {}", direction, amount);
-
         }
 
         // determine grid size
