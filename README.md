@@ -5,7 +5,7 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 ## Using
 
 1. `export AOC_SESSION=D34DBEEF` before running to get input dynamically from AoC server. [How to get session cookie.](https://github.com/wimglenn/advent-of-code-wim/issues/1)
-2. `cargo run 4` runs just `Day04.rs`
+2. `cd 2024; cargo run 4` runs just `Day04.rs`
 3. `cargo run all` runs all days
 4. `cargo run --release all` for fastest benchmark
 
