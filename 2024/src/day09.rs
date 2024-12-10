@@ -3,7 +3,7 @@ mod common;
 
 const EMPTY: usize = usize::MAX;
 
-/// Resonant Collinearity
+/// Disk Defragmenter
 fn part(filename: &str, is_part1: bool) -> usize {
     let mut acc = 0;
     // parse info
