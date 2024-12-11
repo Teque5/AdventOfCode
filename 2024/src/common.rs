@@ -1,4 +1,4 @@
-/// Commonly-used library functions for Advent of Code solutions
+/// Library functions for Advent of Code solutions
 /// Copyright 2021 Alex Utter, 2022-2024 Teque5
 use ndarray::{Array2, Axis};
 use std::fs::File;
@@ -8,7 +8,7 @@ use std::io::Read;
 use std::io::Result;
 use std::str::FromStr;
 
-/// Style string used for all progress bars
+/// style string for indicatif::ProgressBar
 #[allow(dead_code)]
 pub const STYLE: &str = "{bar:40.cyan/blue} {pos:>9}/{len:9} [{eta} left] {msg}";
 
@@ -32,6 +32,9 @@ pub fn read_lines_as<T: FromStr>(filename: &str) -> Vec<T> {
 }
 
 /// read a file with rectangular text block as a 2d array of chars
+/// 123
+/// 456
+/// 789
 #[allow(dead_code)]
 pub fn read_2d_chars(filename: &str) -> (Array2<char>, usize, usize) {
     let mut file = File::open(filename).unwrap();
@@ -52,7 +55,7 @@ pub fn read_2d_chars(filename: &str) -> (Array2<char>, usize, usize) {
     return (ray, rows, cols);
 }
 
-// print whole 2d array of chars
+/// print 2d array of chars
 #[allow(dead_code)]
 pub fn print_2d_chars(ray: &Array2<char>) {
     for row in ray.axis_iter(Axis(0)) {
@@ -62,6 +65,7 @@ pub fn print_2d_chars(ray: &Array2<char>) {
 }
 
 /// parse character-delimited string as vector
+/// 1,-3,4,5
 #[allow(dead_code)]
 pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
     line.split(delim)
@@ -70,12 +74,11 @@ pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
 }
 
 /// parse string, ignore text, and return +/- single or multi-digit numbers
+/// 1 -3 4 5
 #[allow(dead_code)]
 pub fn parse_numbers(line: &str) -> Vec<isize> {
-    line.chars()
-        .filter(|c| c.is_digit(10) || c.is_whitespace() || *c == '-')
-        .collect::<String>()
-        .split_whitespace()
-        .filter_map(|s| s.parse().ok())
+    line.split_whitespace()
+        .map(|s| s.trim())
+        .filter_map(|s| s.parse::<isize>().ok())
         .collect()
 }
