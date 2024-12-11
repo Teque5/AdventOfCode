@@ -11,14 +11,17 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 
 ## Annual Thoughts
 
-* **2024**: Rustaceans assemble! Focusing on faster solutions this year.
+* **2024**: Rustaceans assemble! Focusing on faster solutions this year. Caching in rust feels quite clumsy compared to python's `@lru_cache` decorator.
 * **2023**: Going with rust again!
 * **2022**: Using this as an opportunity to learn [rust](https://www.rust-lang.org/). I did use python on some of the puzzles where I was racing against colleagues. :D
 
 ## Visualizations
 
-### 2022 Day15
-![day15](2022/img/day15.webp)
+### 2024 Day10: Hoof It
+![2024 Day10: Hoof It](2024/img/day10.webp)
+
+### 2022 Day15: Beacon Exclusion Zone
+![2022 Day15: Beacon Exclusion Zone](2022/img/day15.webp)
 
 ## Most Useful Crates
 
