@@ -1,5 +1,4 @@
-#[path = "common.rs"]
-mod common;
+use aoc;
 
 use regex::Regex;
 
@@ -9,7 +8,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
 
     let pattern = Regex::new(r"mul\(\s*(\d+)\s*,\s*(\d+)\s*\)").unwrap();
     // parse info
-    let lines = common::read_lines(filename);
+    let lines = aoc::read_lines(filename);
     let mut enable = true;
     for line in lines {
         // println!("line: {}", line);
@@ -57,20 +56,13 @@ fn part(filename: &str, is_part1: bool) -> usize {
     return acc;
 }
 
-pub fn solve() {
-    let day: usize = 3;
-    // Test part-1 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train1", day), true),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val1", day))[0]
-    );
+/// Check training data, then apply to test data
+pub fn solve(day: usize) {
+    assert_eq!(part(&format!("input/{:02}_train1", day), true), 161);
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    // Test part-2 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train2", day), false),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    );
+    assert_eq!(part(&format!("input/{:02}_train2", day), false), 48);
     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+
     println!("Coded: 55 Minutes");
 }

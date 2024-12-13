@@ -61,7 +61,7 @@ fn read_from_web(year: &usize, day: &usize) -> Option<String> {
 
 /// Fetch input for a given year/day from cache if available.
 /// Otherwise, download from server and update local cache.
-pub fn get_data(year: usize, day: usize) -> bool {
+pub fn get_data(year: &usize, day: &usize) -> bool {
     if let Some(_data) = read_from_cache(&day) {
         // Use local cache.
         return true;

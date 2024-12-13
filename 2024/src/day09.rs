@@ -1,5 +1,4 @@
-#[path = "common.rs"]
-mod common;
+use aoc;
 
 const EMPTY: usize = usize::MAX;
 
@@ -8,7 +7,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
     let mut acc = 0;
     // parse info
     let mut disk: Vec<usize> = Vec::new();
-    let line = &common::read_lines(filename)[0];
+    let line = &aoc::read_lines(filename)[0];
     for (cdx, ccc) in line.chars().enumerate() {
         let count = ccc.to_digit(10).unwrap() as usize;
         if cdx % 2 == 0 {
@@ -104,20 +103,13 @@ fn part(filename: &str, is_part1: bool) -> usize {
     return acc;
 }
 
-pub fn solve() {
-    let day: usize = 9;
-    // Test part-1 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), true),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val1", day))[0]
-    );
+/// Check training data, then apply to test data
+pub fn solve(day: usize) {
+    assert_eq!(part(&format!("input/{:02}_train", day), true), 1928);
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    // // Test part-2 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), false),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    );
+    assert_eq!(part(&format!("input/{:02}_train", day), false), 2858);
     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+
     println!("Coded: 87 Minutes");
 }

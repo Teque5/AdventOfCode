@@ -1,5 +1,4 @@
-#[path = "common.rs"]
-mod common;
+use aoc;
 use indicatif::{ProgressBar, ProgressStyle};
 use ndarray::Array2;
 use ndarray::Array3;
@@ -46,8 +45,8 @@ fn walk(
 /// Guard Gallivant
 fn part(filename: &str, is_part1: bool) -> usize {
     // parse info
-    let (map, rows, cols) = common::read_2d_chars(filename);
-    // common::print_2d_chars(&map);
+    let (map, rows, cols) = aoc::read_2d_chars(filename);
+    // aoc::print_2d_chars(&map);
 
     // find start position
     let mut position: (usize, usize) = (0, 0);
@@ -86,7 +85,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
     let mut walked: Array3<bool> = Array3::from_elem((rows, cols, 4), false);
     // fancy progress bar
     let progress = ProgressBar::new((rows * cols) as u64);
-    progress.set_style(ProgressStyle::with_template(common::STYLE).unwrap());
+    progress.set_style(ProgressStyle::with_template(aoc::STYLE).unwrap());
     progress.set_message("Simulating Obstacles");
     // add obstruction
     for rdx in 0..rows {
@@ -132,20 +131,13 @@ fn part(filename: &str, is_part1: bool) -> usize {
     return acc;
 }
 
-pub fn solve() {
-    let day: usize = 6;
-    // Test part-1 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), true),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val1", day))[0]
-    );
+/// Check training data, then apply to test data
+pub fn solve(day: usize) {
+    assert_eq!(part(&format!("input/{:02}_train", day), true), 41);
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    // Test part-2 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), false),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    );
+    assert_eq!(part(&format!("input/{:02}_train", day), false), 6);
     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+
     println!("Coded: 86 Minutes");
 }
