@@ -1,5 +1,4 @@
-#[path = "common.rs"]
-mod common;
+use aoc;
 use indicatif::ParallelProgressIterator;
 use indicatif::ProgressStyle;
 use rayon::prelude::*;
@@ -63,14 +62,14 @@ impl Iterator for Combinations {
 fn part(filename: &str, is_part1: bool) -> usize {
     let acc = AtomicUsize::new(0);
     // parse info
-    let lines = common::read_lines(filename);
-    let style = ProgressStyle::with_template(common::STYLE).unwrap();
+    let lines = aoc::read_lines(filename);
+    let style = ProgressStyle::with_template(aoc::STYLE).unwrap();
     lines
         .par_iter()
         .progress_with_style(style)
         .for_each(|line| {
-            let result = common::parse_delimited::<usize>(&line, ':')[0];
-            let numbers = common::parse_delimited::<usize>(&line, ' ');
+            let result = aoc::parse_delimited::<usize>(&line, ':')[0];
+            let numbers = aoc::parse_delimited::<usize>(&line, ' ');
             let num_operators = if is_part1 { 2 } else { 3 };
             let combos = Combinations::new(numbers.len() - 1, num_operators);
             // let combos = combinations(numbers.len() - 1, num_operators);
@@ -103,20 +102,13 @@ fn part(filename: &str, is_part1: bool) -> usize {
     return acc.load(Ordering::Relaxed);
 }
 
-pub fn solve() {
-    let day: usize = 7;
-    // Test part-1 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), true),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val1", day))[0]
-    );
+/// Check training data, then apply to test data
+pub fn solve(day: usize) {
+    assert_eq!(part(&format!("input/{:02}_train", day), true), 3749);
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    // // Test part-2 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), false),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    );
+    assert_eq!(part(&format!("input/{:02}_train", day), false), 11387);
     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+
     println!("Coded: 63 Minutes");
 }

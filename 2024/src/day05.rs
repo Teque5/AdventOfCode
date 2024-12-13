@@ -1,5 +1,4 @@
-#[path = "common.rs"]
-mod common;
+use aoc;
 
 /// check that update complies with the rules
 fn check_correct(update: &Vec<usize>, rules: &Vec<Vec<usize>>, ok: &mut bool) -> usize {
@@ -36,7 +35,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
     let mut acc = 0usize;
 
     // parse info
-    let lines = common::read_lines(filename);
+    let lines = aoc::read_lines(filename);
     let mut is_rule = true;
     // there seem to be < 100 pages
     let mut rules: Vec<Vec<usize>> = vec![Vec::new(); 100];
@@ -48,13 +47,13 @@ fn part(filename: &str, is_part1: bool) -> usize {
         }
         if is_rule {
             // insert rules into LUT
-            let raw_rule = common::parse_delimited::<usize>(&line, '|');
+            let raw_rule = aoc::parse_delimited::<usize>(&line, '|');
             rules[raw_rule[0]].push(raw_rule[1]);
         } else {
             // check updates
             let mut ok = true;
             let mut bad_index: usize;
-            let update = common::parse_delimited::<usize>(&line, ',');
+            let update = aoc::parse_delimited::<usize>(&line, ',');
             bad_index = check_correct(&update, &rules, &mut ok);
             if ok && is_part1 {
                 // add middle value
@@ -75,20 +74,13 @@ fn part(filename: &str, is_part1: bool) -> usize {
     return acc;
 }
 
-pub fn solve() {
-    let day: usize = 5;
-    // Test part-1 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), true),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val1", day))[0]
-    );
+/// Check training data, then apply to test data
+pub fn solve(day: usize) {
+    assert_eq!(part(&format!("input/{:02}_train", day), true), 143);
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    // Test part-2 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), false),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    );
+    assert_eq!(part(&format!("input/{:02}_train", day), false), 123);
     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+
     println!("Coded: 78 Minutes");
 }

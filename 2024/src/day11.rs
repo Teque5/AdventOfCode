@@ -1,5 +1,4 @@
-#[path = "common.rs"]
-mod common;
+use aoc;
 use lru::LruCache;
 use std::num::NonZeroUsize;
 
@@ -54,8 +53,8 @@ impl Cache {
 /// Un-cached version died after 48 iterations and >32 GB RAM use
 fn part(filename: &str, is_part1: bool) -> usize {
     // parse info
-    let line = common::read_lines(filename);
-    let stones = common::parse_numbers(&line[0]);
+    let line = aoc::read_lines(filename);
+    let stones = aoc::parse_numbers(&line[0]);
     let num_blinks = if is_part1 { 25 } else { 75 };
     // process_stones
     let mut acc = 0;
@@ -67,13 +66,9 @@ fn part(filename: &str, is_part1: bool) -> usize {
     return acc;
 }
 
-pub fn solve() {
-    let day: usize = 11;
-    // Test part-1 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), true),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val1", day))[0]
-    );
+/// Check training data, then apply to test data
+pub fn solve(day: usize) {
+    assert_eq!(part(&format!("input/{:02}_train", day), true), 55312);
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
     println!("Coded: 101 Minutes");

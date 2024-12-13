@@ -8,6 +8,7 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 2. `cd 2024; cargo run 4` runs just `Day04.rs`
 3. `cargo run all` runs all days
 4. `cargo run --release all` for fastest benchmark
+5. `cargo test --doc` runs all tests
 
 ## Annual Thoughts
 

@@ -1,5 +1,4 @@
-#[path = "common.rs"]
-mod common;
+use aoc;
 
 /// List Distance
 fn part(filename: &str, is_part1: bool) -> usize {
@@ -8,9 +7,9 @@ fn part(filename: &str, is_part1: bool) -> usize {
     let mut right: Vec<isize> = Vec::new();
 
     // parse info
-    let lines = common::read_lines(filename);
+    let lines = aoc::read_lines(filename);
     for line in lines {
-        let row = common::parse_numbers(&line);
+        let row = aoc::parse_numbers(&line);
         left.push(row[0] as isize);
         right.push(row[1] as isize);
     }
@@ -38,20 +37,13 @@ fn part(filename: &str, is_part1: bool) -> usize {
     return acc;
 }
 
-pub fn solve() {
-    let day: usize = 1;
-    // Test part-1 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), true),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val1", day))[0]
-    );
+/// Check training data, then apply to test data
+pub fn solve(day: usize) {
+    assert_eq!(part(&format!("input/{:02}_train", day), true), 11);
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    // Test part-2 solver, then apply to real input.
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), false),
-        common::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
-    );
+    assert_eq!(part(&format!("input/{:02}_train", day), false), 31);
     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+
     println!("Coded: 45 minutes");
 }
