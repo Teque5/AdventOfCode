@@ -1,66 +1,38 @@
 #[path = "common.rs"]
 mod common;
-use ndarray::{Array1, Array2};
-
-/// ignore text and just return single or multi-digit numbers
-fn parse_numbers(line: &str) -> Vec<isize> {
-    line.chars()
-        .filter(|c| c.is_digit(10) || c.is_whitespace())
-        .collect::<String>()
-        .split_whitespace()
-        .filter_map(|s| s.parse().ok())
-        .collect()
-}
-
 
 /// Claw Contraption
-/// use matrix solve Ax = B
-/// TODO: for part2 dispense with matrix math and use simultaneous equations; remember to add 10 trillion also
+/// The "minimum cost" part of the problem is a red herring.
+/// Directly compute the exact number of pushes; valid if integer value.
 fn part(filename: &str, is_part1: bool) -> usize {
     let mut tokens = 0usize;
     // parse info
     let lines = common::read_lines(filename);
-    let zeros = Array1::zeros(2);
-    let mut aaa: Vec<isize> = Vec::new();
+    let mut coeffs: Vec<isize> = Vec::new();
+    let bonus = if is_part1 { 0 } else { 10000000000000 };
     for line in lines {
         // println!("{:?}", line);
-        let numbers = parse_numbers(&line);
+        let numbers = common::parse_numbers(&line);
         if line.starts_with("Button") {
-            aaa.extend(numbers);
+            coeffs.extend(numbers);
         } else if line.starts_with("Prize") {
             // Compute tokens required to solve problem
-            let coeffs: Array2<isize> = Array2::from_shape_vec((2, 2), aaa.clone()).expect("?");
-            let result: Array1<isize> = Array1::from(numbers);
-
-            // println!("{:?} {:?}", coeffs, result);
-            // println!("start!");
-            let mut best_cost = isize::MAX;
-            let mut has_solution = false;
-            for adx in 0..100 {
-                for bdx in 0..100 {
-                    let guess: Array1<isize> = Array1::from(vec![adx, bdx]);
-                    if (result.clone() - guess.dot(&coeffs)) == zeros {
-                        // good solution
-                        let cost = adx * 3 + bdx;
-                        if cost < best_cost {
-                            best_cost = cost;
-                            // println!("a={} b={} oK! ${}", adx, bdx, best_cost);
-                        }
-                        has_solution = true;
-                    }
-                    // let bla = ;
-                    // if is_solution(coeffs, result.clone(), guess) {
-                    //     println!("ok!")
-                    // }
-                }
-            }
-            if has_solution {
-                tokens += best_cost as usize;
+            let p0 = numbers[0] + bonus;
+            let p1 = numbers[1] + bonus;
+            let x0 = coeffs[0];
+            let y0 = coeffs[1];
+            let x1 = coeffs[2];
+            let y1 = coeffs[3];
+            // compute exact intercept point directly
+            let a_push = (p0 * y1 - p1 * x1) as f64 / (x0 * y1 - x1 * y0) as f64;
+            let b_push = (p0 * y0 - p1 * x0) as f64 / (x1 * y0 - y1 * x0) as f64;
+            if a_push.fract() == 0f64 && b_push.fract() == 0f64 {
+                // exact integer solution is correct
+                tokens += a_push as usize * 3 + b_push as usize;
             }
 
             // reset for next puzzle
-            aaa.clear();
-            // break;
+            coeffs.clear();
         }
     }
     return tokens;
@@ -73,7 +45,11 @@ pub fn solve() {
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
     // Test part-2 solver, then apply to real input.
-    // assert_eq!(part(&format!("input/{:02}_train", day), false), 480);
-    // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
-    // println!("Coded: 50+ Minutes"); //started 918pm
+    // No validation value was given for the training data, but I created one.
+    assert_eq!(
+        part(&format!("input/{:02}_train", day), false),
+        875318608908
+    );
+    println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+    println!("Coded: 65 Minutes");
 }

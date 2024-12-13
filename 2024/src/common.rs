@@ -65,7 +65,7 @@ pub fn print_2d_chars(ray: &Array2<char>) {
 }
 
 /// parse character-delimited string as vector
-/// 1,-3,4,5
+/// "1,-3,4,5" -> [1, -3, 4, 5]
 #[allow(dead_code)]
 pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
     line.split(delim)
@@ -74,11 +74,14 @@ pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
 }
 
 /// parse string, ignore text, and return +/- single or multi-digit numbers
-/// 1 -3 4 5
+/// "1 ⍼:: whatever-30 4 5" -> [1, -30, 4, 5]
 #[allow(dead_code)]
 pub fn parse_numbers(line: &str) -> Vec<isize> {
-    line.split_whitespace()
+    line.chars()
+        .filter(|c| c.is_digit(10) || c.is_whitespace() || *c == '-')
+        .collect::<String>()
+        .split_whitespace()
         .map(|s| s.trim())
-        .filter_map(|s| s.parse::<isize>().ok())
+        .filter_map(|s| s.parse().ok())
         .collect()
 }
