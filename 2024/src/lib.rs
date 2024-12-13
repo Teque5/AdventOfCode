@@ -66,6 +66,8 @@ pub fn print_2d_chars(ray: &Array2<char>) {
 /// use aoc::parse_delimited;
 /// let result = parse_delimited::<isize>("1,-30,4,5", ',');
 /// assert_eq!(result, [1, -30, 4, 5]);
+/// let result = parse_delimited::<isize>("0|1|2|3", '|');
+/// assert_eq!(result, [0, 1, 2, 3]);
 /// ```
 pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
     line.split(delim)
@@ -79,6 +81,8 @@ pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
 /// use aoc::parse_numbers;
 /// let result = parse_numbers("1 ⍼:: whatever-30 4 5");
 /// assert_eq!(result, [1, -30, 4, 5]);
+/// let result = parse_numbers("Prize: X=8400, Y=5400");
+/// assert_eq!(result, [8400, 5400]);
 /// ```
 pub fn parse_numbers(line: &str) -> Vec<isize> {
     line.chars()
