@@ -68,6 +68,8 @@ pub fn print_2d_chars(ray: &Array2<char>) {
 /// assert_eq!(result, [1, -30, 4, 5]);
 /// let result = parse_delimited::<isize>("0|1|2|3", '|');
 /// assert_eq!(result, [0, 1, 2, 3]);
+/// let result = parse_delimited::<u8>("0,255,256,", ',');
+/// assert_eq!(result, [0, 255]);
 /// ```
 pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
     line.split(delim)
@@ -79,16 +81,18 @@ pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
 /// ## Example
 /// ```
 /// use aoc::parse_numbers;
-/// let result = parse_numbers("1 ⍼:: whatever-30 4 5");
+/// let result = parse_numbers::<i8>("1 ⍼:: whatever-30 4 5");
 /// assert_eq!(result, [1, -30, 4, 5]);
-/// let result = parse_numbers("Prize: X=8400, Y=5400");
+/// let result = parse_numbers::<u64>("Prize: X=8400, Y=5400");
 /// assert_eq!(result, [8400, 5400]);
-/// let result = parse_numbers("<123>|<-1> 2&3");
+/// let result = parse_numbers::<isize>("<123>|<-1> 2&3");
 /// assert_eq!(result, [123, -1, 2, 3]);
+/// let result = parse_numbers::<f32>("123.456x789,0.5");
+/// assert_eq!(result, [123.456, 789.0, 0.5]);
 /// ```
-pub fn parse_numbers(line: &str) -> Vec<isize> {
-    line.split(|c: char| !c.is_digit(10) && c != '-')
+pub fn parse_numbers<T: FromStr>(line: &str) -> Vec<T> {
+    line.split(|c: char| !c.is_digit(10) && c != '-' && c != '.')
         .filter(|s| !s.is_empty())
-        .filter_map(|s| s.parse().ok())
+        .filter_map(|s| s.parse::<T>().ok())
         .collect()
 }

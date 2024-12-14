@@ -54,14 +54,14 @@ impl Cache {
 fn part(filename: &str, is_part1: bool) -> usize {
     // parse info
     let line = aoc::read_lines(filename);
-    let stones = aoc::parse_numbers(&line[0]);
+    let stones = aoc::parse_numbers::<usize>(&line[0]);
     let num_blinks = if is_part1 { 25 } else { 75 };
     // process_stones
     let mut acc = 0;
     // allow 1 million cache entries
     let mut cache = Cache::new(1 << 20, num_blinks);
     for stone in stones {
-        acc += cache.process_stone(stone as usize, 0);
+        acc += cache.process_stone(stone, 0);
     }
     return acc;
 }
