@@ -83,13 +83,12 @@ pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
 /// assert_eq!(result, [1, -30, 4, 5]);
 /// let result = parse_numbers("Prize: X=8400, Y=5400");
 /// assert_eq!(result, [8400, 5400]);
+/// let result = parse_numbers("<123>|<-1> 2&3");
+/// assert_eq!(result, [123, -1, 2, 3]);
 /// ```
 pub fn parse_numbers(line: &str) -> Vec<isize> {
-    line.chars()
-        .filter(|c| c.is_digit(10) || c.is_whitespace() || *c == '-')
-        .collect::<String>()
-        .split_whitespace()
-        .map(|s| s.trim())
+    line.split(|c: char| !c.is_digit(10) && c != '-')
+        .filter(|s| !s.is_empty())
         .filter_map(|s| s.parse().ok())
         .collect()
 }

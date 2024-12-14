@@ -18,8 +18,8 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 
 ## Visualizations
 
-### 2024 Day10: Hoof It
-![2024 Day10: Hoof It](2024/img/day10.webp)
+### 2024 Day14: Restroom Redoubt
+![2024 Day14: Restroom Redoubt](2024/img/day14.gif)
 
 ### 2022 Day15: Beacon Exclusion Zone
 ![2022 Day15: Beacon Exclusion Zone](2022/img/day15.webp)
