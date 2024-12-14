@@ -45,6 +45,28 @@ fn matching_directions(
     return possible;
 }
 
+// fn matching_directions_in_region(
+//     position: &(usize, usize),
+//     region: &Array2<bool>,
+//     rows: usize,
+//     cols: usize,
+// ) -> Vec<(usize, usize)> {
+//     let mut possible: Vec<(usize, usize)> = Vec::new();
+//     for direction in DIRECTIONS {
+//         let new_position = (
+//             position.0 as isize + direction.0,
+//             position.1 as isize + direction.1,
+//         );
+//         if is_in_map(rows, cols, new_position) {
+//             let new_usize_position = (new_position.0 as usize, new_position.1 as usize);
+//             if region[new_usize_position] {
+//                 possible.push(new_usize_position);
+//             }
+//         }
+//     }
+//     return possible;
+// }
+
 /// Garden Groups
 /// For part2 the trick is that num_corners == num_sides
 fn part(filename: &str, is_part1: bool) -> usize {
@@ -139,7 +161,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
                                     && !same_row_or_same_column(&region_match)
                                 {
                                     // exterior corner
-                                    // println!("ext");
+                                    println!("ext");
                                     corners += 1
                                 } else if !is_region
                                     && both_contiguous
@@ -165,6 +187,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
                                     }
 
                                     if !mobius {
+                                        println!("not mobius->+1");
                                         // interior corner
                                         corners += 1
                                     }
@@ -219,12 +242,13 @@ pub fn solve(day: usize) {
     // assert_eq!(part(&format!("input/{:02}_train1", day), true), 772);
     // println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    // Test part-2 solver, then apply to real input.
-    assert_eq!(part(&format!("input/{:02}_train0", day), false), 80);
-    assert_eq!(part(&format!("input/{:02}_train1", day), false), 436);
-    assert_eq!(part(&format!("input/{:02}_train2", day), false), 236);
-    assert_eq!(part(&format!("input/{:02}_train3", day), false), 1206);
-    assert_eq!(part(&format!("input/{:02}_train4", day), false), 368);
+    // // Test part-2 solver, then apply to real input.
+    // assert_eq!(part(&format!("input/{:02}_train0", day), false), 80);
+    // assert_eq!(part(&format!("input/{:02}_train1", day), false), 436);
+    // assert_eq!(part(&format!("input/{:02}_train2", day), false), 236);
+    // assert_eq!(part(&format!("input/{:02}_train3", day), false), 1206);
+    // assert_eq!(part(&format!("input/{:02}_train4", day), false), 368);
+    assert_eq!(part(&format!("input/{:02}_train5", day), false), 414);
     // assert_eq!(
     //     part(&format!("input/{:02}_train", day), false),
     //     aoc::read_lines_as::<usize>(&format!("input/{:02}_val2", day))[0]
@@ -234,9 +258,11 @@ pub fn solve(day: usize) {
     //     aoc::read_lines_as::<usize>(&format!("input/{:02}_val_extra", day))[0]
     // );
     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
-    // println!("Coded: 120+120+ Minutes");
+    // println!("Coded: 120+120+60+ Minutes");
     // 7431260 is too high
     // 867192 is wrong
+    // 855693 is wrong
     // 855497 is wrong
+    // 849322 target
     // 842136 is too low
 }
