@@ -61,14 +61,9 @@ fn part(filename: &str, is_part1: bool) -> u64 {
     let lines = aoc::read_lines(filename);
     let mut robots: Vec<(i64, i64, i64, i64)> = Vec::new();
     for line in lines {
-        let numbers = aoc::parse_numbers(&line);
+        let numbers = aoc::parse_numbers::<i64>(&line);
         // row_pos, col_pos, row_vel, col_vel
-        robots.push((
-            numbers[1] as i64,
-            numbers[0] as i64,
-            numbers[3] as i64,
-            numbers[2] as i64,
-        ));
+        robots.push((numbers[1], numbers[0], numbers[3], numbers[2]));
     }
     let is_training = robots.len() == 12;
     let rows: i64 = if is_training { 7 } else { 103 };
@@ -88,7 +83,8 @@ fn part(filename: &str, is_part1: bool) -> u64 {
             }
         }
         // 7773 7773 7773
-        if second == 100 && is_part1 {
+        if second == 99 && is_part1 {
+            // 99 is the 100th second!
             return count_robots(&robots, rows, cols);
         }
         if second % 101 == 97 {

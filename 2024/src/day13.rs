@@ -7,11 +7,11 @@ fn part(filename: &str, is_part1: bool) -> usize {
     let mut tokens = 0usize;
     // parse info
     let lines = aoc::read_lines(filename);
-    let mut coeffs: Vec<isize> = Vec::new();
+    let mut coeffs: Vec<i64> = Vec::new();
     let bonus = if is_part1 { 0 } else { 10000000000000 };
     for line in lines {
         // println!("{:?}", line);
-        let numbers = aoc::parse_numbers(&line);
+        let numbers = aoc::parse_numbers::<i64>(&line);
         if line.starts_with("Button") {
             coeffs.extend(numbers);
         } else if line.starts_with("Prize") {

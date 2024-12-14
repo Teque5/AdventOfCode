@@ -40,7 +40,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
     // parse info
     let lines = aoc::read_lines(filename);
     for line in lines {
-        let row = aoc::parse_numbers(&line);
+        let row = aoc::parse_numbers::<isize>(&line);
         if is_safe(&row) {
             acc += 1;
         } else if !is_part1 {

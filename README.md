@@ -1,4 +1,4 @@
-# AdventOfCode
+# Advent of Code
 
 This is repository holds my solutions to the [Advent of Code](https://adventofcode.com/) puzzles.
 
@@ -76,9 +76,8 @@ lines.par_iter().for_each(|line| {
 let final_acc = acc.load(Ordering::Relaxed);
 ```
 
-### Dependencies
+### Requirements
 
 ```bash
-# 2023+ Requirement
 apt install libssl-dev
 ```

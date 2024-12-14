@@ -9,9 +9,9 @@ fn part(filename: &str, is_part1: bool) -> usize {
     // parse info
     let lines = aoc::read_lines(filename);
     for line in lines {
-        let row = aoc::parse_numbers(&line);
-        left.push(row[0] as isize);
-        right.push(row[1] as isize);
+        let row = aoc::parse_numbers::<isize>(&line);
+        left.push(row[0]);
+        right.push(row[1]);
     }
     if is_part1 {
         // between left and right, sum distances between lists
