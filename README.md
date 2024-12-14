@@ -78,6 +78,9 @@ let final_acc = acc.load(Ordering::Relaxed);
 
 ### Requirements
 
+* `libssl` needed for aoc input fetch
+* `ffmpeg` needed for animated GIFs (2024 day14)
+
 ```bash
-apt install libssl-dev
+apt install libssl-dev ffmpeg
 ```
