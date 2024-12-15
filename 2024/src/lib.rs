@@ -61,13 +61,13 @@ pub fn print_2d_chars(ray: &Array2<char>) {
 }
 
 /// parse character-delimited string as type
-/// ## Example
+/// ## Examples
 /// ```
 /// use aoc::parse_delimited;
 /// let result = parse_delimited::<isize>("1,-30,4,5", ',');
 /// assert_eq!(result, [1, -30, 4, 5]);
-/// let result = parse_delimited::<isize>("0|1|2|3", '|');
-/// assert_eq!(result, [0, 1, 2, 3]);
+/// let result = parse_delimited::<f64>("0|1|2|3", '|');
+/// assert_eq!(result, [0.0, 1.0, 2.0, 3.0]);
 /// let result = parse_delimited::<u8>("0,255,256,", ',');
 /// assert_eq!(result, [0, 255]);
 /// ```
@@ -78,7 +78,7 @@ pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
 }
 
 /// parse string, ignore text, and return +/- single or multi-digit numbers
-/// ## Example
+/// ## Examples
 /// ```
 /// use aoc::parse_numbers;
 /// let result = parse_numbers::<i8>("1 ⍼:: whatever-30 4 5");
