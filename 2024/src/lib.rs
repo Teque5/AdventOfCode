@@ -1,5 +1,7 @@
 /// Library functions for Advent of Code solutions
 /// Copyright 2021 Alex Utter, 2022-2024 Teque5
+// use ab_glyph::{FontRef, PxScale}};
+// use image::RgbImage;
 use ndarray::{Array2, Axis};
 use std::fs::File;
 use std::io::BufRead;
@@ -7,6 +9,14 @@ use std::io::BufReader;
 use std::io::Read;
 use std::io::Result;
 use std::str::FromStr;
+
+/// commonly used directions (row, col) for mazes and whatnot
+pub const DIRECTIONS: [(isize, isize); 4] = [
+    (-1, 0), // up
+    (1, 0),  // down
+    (0, -1), // left
+    (0, 1),  // right
+];
 
 /// style string for indicatif::ProgressBar
 pub const STYLE: &str = "{bar:40.cyan/blue} {pos:>9}/{len:9} [{eta} left] {msg}";
