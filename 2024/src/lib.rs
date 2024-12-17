@@ -71,6 +71,7 @@ pub fn print_2d_chars(ray: &Array2<char>) {
 }
 
 /// parse character-delimited string as type
+///
 /// ## Examples
 /// ```
 /// use aoc::parse_delimited;
@@ -87,7 +88,9 @@ pub fn parse_delimited<T: FromStr>(line: &str, delim: char) -> Vec<T> {
         .collect()
 }
 
-/// parse string, ignore text, and return +/- single or multi-digit numbers
+/// parse numbers (fuzzy)
+/// ignore text, and return +/- single or multi-digit numbers
+///
 /// ## Examples
 /// ```
 /// use aoc::parse_numbers;
