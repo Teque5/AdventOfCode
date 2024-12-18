@@ -9,6 +9,8 @@ fn part(filename: &str, is_part1: bool, is_train: bool) -> String {
     let start = (0usize, 0usize);
     let goal = (edge - 1, edge - 1);
     let mut ram: Array2<char> = Array2::from_elem((edge, edge), '.');
+    let mut img = aoc::Image::new(edge, edge);
+    img.set_framerate(30);
 
     // parse bytes
     let lines = aoc::read_lines(filename);
@@ -31,10 +33,6 @@ fn part(filename: &str, is_part1: bool, is_train: bool) -> String {
             } else if bdx == 1023 {
                 break;
             }
-        }
-
-        for (bdx, byte) in bytes.clone().into_iter().enumerate() {
-            println!("{} {},{}", bdx, byte.1, byte.0);
         }
         // show maze
         // aoc::print_2d_chars(&ram);
@@ -66,18 +64,32 @@ fn part(filename: &str, is_part1: bool, is_train: bool) -> String {
                 |p| p.heuristic(goal),
                 |p| p.current == goal,
             ) {
+                // solution found
                 solution = _solution;
                 cost = _cost;
             } else {
+                // no solution
                 bad_bdx = bdx;
-                println!(
-                    "no solution! for {} ({},{})",
-                    bad_bdx, bytes[bad_bdx].1, bytes[bad_bdx].0
-                );
                 break;
             }
-            // println!("{} {} {}",bdx, bytes[bad_bdx].1, bytes[bad_bdx].0);
-            // aoc::print_2d_chars(&ram);
+            // drawing
+            if !is_train && (bdx > 3000 || (bdx > 2000 && bdx % 5 == 0) || (bdx % 10 == 0)) {
+                img.draw_chars(&ram);
+                img.fade();
+                for position in solution {
+                    img.draw_bool(position.current.0, position.current.1, true);
+                }
+                img.draw_text(edge - 3, 0, &format!("byte {}", bdx));
+                img.draw_text(edge - 2, 0, "Teque5");
+                img.draw_text(edge - 1, 0, "Advent of Code 2024");
+                img.render_frame();
+            }
+        }
+        if !is_train {
+            for _ in 0..90 {
+                img.render_frame();
+            }
+            img.render_webp(&"img/day18.webp");
         }
         return format!("{},{}", bytes[bad_bdx].1, bytes[bad_bdx].0);
     }
