@@ -147,7 +147,7 @@ fn push(
                 let rock_pos: (usize, usize) = (next_pos.0, next_pos.1 - 1);
                 ok = big_push(map, rock_pos, diff);
             }
-            _ => panic!("not possible {}", this_char),
+            _ => unreachable!(),
         }
 
         if ok {
@@ -187,7 +187,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
                 'O' => fleeb.extend(vec!['[', ']']),
                 '.' => fleeb.extend(vec!['.', '.']),
                 '@' => fleeb.extend(vec!['@', '.']),
-                _ => panic!("character should not be present"),
+                _ => unreachable!("character should not be present"),
             }
         }
         // twice as wide
@@ -215,7 +215,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
             '>' => (ok, next_pos) = push(&mut map, position, (0, 1)),
             '^' => (ok, next_pos) = push(&mut map, position, (-1, 0)),
             'v' => (ok, next_pos) = push(&mut map, position, (1, 0)),
-            _ => panic!("invalid movement"),
+            _ => unreachable!("invalid movement"),
         }
         if ok {
             position = next_pos;
