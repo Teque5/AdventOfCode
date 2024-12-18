@@ -128,11 +128,11 @@ pub struct Image<'a> {
 
 /// Very often in AoC we have an Array2<_> where we want to visualize the changes
 /// ## Example (not doctest)
-/// let img = aoc::Image::new(10, 20);
+/// let mut img = aoc::Image::new(10, 20);
 /// for _ in 0..10 {
 ///     img.draw_chars(&some_2d_array);
-///     img.render_frame()
-///     img.fade()
+///     img.render_frame();
+///     img.fade();
 /// }
 /// img.render_gif("out.gif");
 #[allow(dead_code)]
@@ -303,10 +303,10 @@ impl Image<'_> {
                 &glob_path,
                 "-vcodec",
                 "libwebp",
-                // "-quality", // enable lossy (not usually worth it)
-                // "10",
-                "-lossless", // enable lossless
-                "1",
+                "-quality", // enable lossy (not usually worth it)
+                "50",
+                // "-lossless", // enable lossless
+                // "1",
                 "-loop", // loop forever
                 "0",
                 "-preset",
