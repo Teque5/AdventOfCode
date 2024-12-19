@@ -18,6 +18,9 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 
 ## Visualizations
 
+### 2024 Day18: RAM Run
+![2024 Day14: RAM Run](2024/img/day18.gif)
+
 ### 2024 Day14: Restroom Redoubt
 ![2024 Day14: Restroom Redoubt](2024/img/day14.gif)
 
