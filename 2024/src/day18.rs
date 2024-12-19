@@ -3,6 +3,7 @@ use ndarray::Array2;
 use pathfinding::directed::astar::astar;
 
 /// RAM Run
+#[allow(unused_assignments)]
 fn part(filename: &str, is_part1: bool, is_train: bool) -> String {
     // setup vars
     let edge: usize = if is_train { 7 } else { 71 };
