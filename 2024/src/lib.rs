@@ -292,6 +292,7 @@ impl Image<'_> {
     /// write framed to animated webp
     pub fn render_webp(&self, file_path: &str) {
         let glob_path = format!("{}", self.dir.path().join("aoc_*.png").display());
+        println!("rendering {} imgs to {}", self.fdx, file_path);
         Command::new("ffmpeg")
             .args([
                 "-y",
@@ -304,7 +305,7 @@ impl Image<'_> {
                 "-vcodec",
                 "libwebp",
                 "-quality", // enable lossy (not usually worth it)
-                "50",
+                "75",
                 // "-lossless", // enable lossless
                 // "1",
                 "-loop", // loop forever
@@ -320,39 +321,9 @@ impl Image<'_> {
     /// write frames to animated GIF
     /// for very small images the one pass approach is often better
     pub fn render_gif(&self, file_path: &str) {
+        println!("rendering {} imgs to {}", self.fdx, file_path);
         let glob_path = format!("{}", self.dir.path().join("aoc_*.png").display());
         // one pass
-        Command::new("ffmpeg")
-            .args([
-                "-y",
-                "-framerate",
-                &format!("{}", self.framerate),
-                "-pattern_type",
-                "glob",
-                "-i",
-                &glob_path,
-                file_path,
-            ])
-            .output()
-            .expect("ffmpeg pass 1 failed");
-        // // two pass
-        // let pal_path = format!("{}", self.dir.path().join("palette.png").display());
-        // // Pass 1
-        // Command::new("ffmpeg")
-        //     .args([
-        //         "-y",
-        //         "-pattern_type",
-        //         "glob",
-        //         "-i",
-        //         &glob_path,
-        //         "-vf",
-        //         "palettegen",
-        //         &pal_path,
-        //     ])
-        //     .output()
-        //     .expect("ffmpeg pass 1 failed");
-
-        // // Pass 2
         // Command::new("ffmpeg")
         //     .args([
         //         "-y",
@@ -362,13 +333,44 @@ impl Image<'_> {
         //         "glob",
         //         "-i",
         //         &glob_path,
-        //         "-i",
-        //         &pal_path,
-        //         "-lavfi",
-        //         "paletteuse",
         //         file_path,
         //     ])
         //     .output()
-        //     .expect("ffmpeg pass 2 failed");
+        //     .expect("ffmpeg pass 1 failed");
+        // two pass
+        let pal_path = format!("{}", self.dir.path().join("palette.png").display());
+        // Pass 1
+        Command::new("ffmpeg")
+            .args([
+                "-y",
+                "-pattern_type",
+                "glob",
+                "-i",
+                &glob_path,
+                "-vf",
+                "palettegen",
+                &pal_path,
+            ])
+            .output()
+            .expect("ffmpeg pass 1 failed");
+
+        // Pass 2
+        Command::new("ffmpeg")
+            .args([
+                "-y",
+                "-framerate",
+                &format!("{}", self.framerate),
+                "-pattern_type",
+                "glob",
+                "-i",
+                &glob_path,
+                "-i",
+                &pal_path,
+                "-lavfi",
+                "paletteuse",
+                file_path,
+            ])
+            .output()
+            .expect("ffmpeg pass 2 failed");
     }
 }

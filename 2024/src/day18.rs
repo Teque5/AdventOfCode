@@ -8,8 +8,9 @@ fn part(filename: &str, is_part1: bool, is_train: bool) -> String {
     let edge: usize = if is_train { 7 } else { 71 };
     let start = (0usize, 0usize);
     let goal = (edge - 1, edge - 1);
-    let mut ram: Array2<char> = Array2::from_elem((edge, edge), '.');
+    let mut ram: Array2<char> = Array2::from_elem((edge, edge), ' ');
     let mut img = aoc::Image::new(edge, edge);
+    img.set_fontsize(2.0);
     img.set_framerate(30);
 
     // parse bytes
@@ -52,6 +53,7 @@ fn part(filename: &str, is_part1: bool, is_train: bool) -> String {
         return cost.to_string();
     } else {
         let mut bad_bdx = 0usize;
+        let mut prior_cost = 0usize;
         // part2 we gradually fill maze and figure out when it's not navigable
         for (bdx, byte) in bytes.clone().into_iter().enumerate() {
             // write to ram
@@ -65,6 +67,7 @@ fn part(filename: &str, is_part1: bool, is_train: bool) -> String {
                 |p| p.current == goal,
             ) {
                 // solution found
+                prior_cost = cost;
                 solution = _solution;
                 cost = _cost;
             } else {
@@ -72,16 +75,16 @@ fn part(filename: &str, is_part1: bool, is_train: bool) -> String {
                 bad_bdx = bdx;
                 break;
             }
-            // drawing
-            if !is_train && (bdx > 3000 || (bdx > 2000 && bdx % 5 == 0) || (bdx % 10 == 0)) {
+            // draw every 10th frame or when cost changes
+            if !is_train && (bdx % 10 == 0 || prior_cost != cost) {
                 img.draw_chars(&ram);
                 img.fade();
                 for position in solution {
                     img.draw_bool(position.current.0, position.current.1, true);
                 }
-                img.draw_text(edge - 3, 0, &format!("byte {}", bdx));
-                img.draw_text(edge - 2, 0, "Teque5");
-                img.draw_text(edge - 1, 0, "Advent of Code 2024");
+                // img.draw_text(edge - 3, 0, &format!("byte {}", bdx));
+                // img.draw_text(edge - 2, 0, "Teque5");
+                // img.draw_text(edge - 1, 0, "Advent of Code 2024");
                 img.render_frame();
             }
         }
@@ -89,7 +92,8 @@ fn part(filename: &str, is_part1: bool, is_train: bool) -> String {
             for _ in 0..90 {
                 img.render_frame();
             }
-            img.render_webp(&"img/day18.webp");
+            // img.render_webp(&"img/day18.webp");
+            img.render_gif(&"img/day18.gif");
         }
         return format!("{},{}", bytes[bad_bdx].1, bytes[bad_bdx].0);
     }
@@ -133,7 +137,7 @@ impl Position {
                 continue;
             }
             let new_pos_usize = (new_pos.0 as usize, new_pos.1 as usize);
-            if maze[new_pos_usize] == '.' {
+            if maze[new_pos_usize] == ' ' {
                 // this new position is an empty space
                 let cost = 1usize;
                 // this is a valid position
