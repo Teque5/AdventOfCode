@@ -28,7 +28,7 @@ use std::collections::HashMap;
 /// +---+---+---+
 /// | < | v | > |
 /// +---+---+---+
-fn part(filename: &str, _is_part1: bool) -> usize {
+fn part(filename: &str, is_part1: bool) -> usize {
     // define keypads
     let lg_keypad: HashMap<char, (usize, usize)> = vec![
         ('7', (0, 0)),
@@ -51,7 +51,7 @@ fn part(filename: &str, _is_part1: bool) -> usize {
     let mut sm_maze: Array2<bool> = Array2::from_elem((2, 3), true);
     sm_maze[(0, 0)] = false;
 
-    let inv_direction: HashMap<(isize, isize), char> = vec![
+    let direction_lut: HashMap<(isize, isize), char> = vec![
         ((-1, 0), '^'), // up
         ((1, 0), 'v'),  // down
         ((0, -1), '<'), // left
@@ -76,26 +76,51 @@ fn part(filename: &str, _is_part1: bool) -> usize {
     for code in code_strings {
         let code_numeric: usize = code[0..3].parse().unwrap();
         let code_chars: Vec<char> = code.chars().collect();
-        let mut alpha: (usize, usize);
-        let mut omega: (usize, usize);
-        println!("code={}", code);
+        let paths = vec![code_chars];
+        let (paths, _max_len) = keypad(&paths, &lg_keypad, &lg_maze, (3, 2), &direction_lut);
+        let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
 
-        // determine path on large keypad
-        let mut push_0: Vec<Vec<Vec<char>>> = Vec::new();
-        for cdx in 0..code_chars.len() {
+
+        // println!("");
+        // for possible in &paths {
+        //     println!(
+        //         "push_2 {} {}",
+        //         possible.len(),
+        //         possible.clone().into_iter().collect::<String>(),
+        //     )
+        // }
+        complexity += _max_len * code_numeric;
+    }
+    return complexity;
+}
+
+/// given a prior keypad path, return next keypad path
+fn keypad(
+    possibilities: &Vec<Vec<char>>,
+    keypad_lut: &HashMap<char, (usize, usize)>,
+    keypad_maze: &Array2<bool>,
+    keypad_start_position: (usize, usize),
+    direction_lut: &HashMap<(isize, isize), char>,
+) -> (Vec<Vec<char>>, usize) {
+    let mut alpha: (usize, usize);
+    let mut omega: (usize, usize);
+    let mut push_1: Vec<Vec<char>> = Vec::new();
+    for possible in possibilities {
+        let mut fleeb: Vec<Vec<Vec<char>>> = Vec::new();
+        for cdx in 0..possible.len() {
             if cdx == 0 {
-                alpha = (3usize, 2usize); // start pointed at A
+                alpha = keypad_start_position; // start pointed at A!
             } else {
-                alpha = *lg_keypad.get(&code_chars[cdx - 1]).unwrap();
+                alpha = *keypad_lut.get(&possible[cdx - 1]).unwrap();
             }
-            // println!("find {}", code_chars[cdx]);
-            omega = *lg_keypad.get(&code_chars[cdx]).unwrap();
+            omega = *keypad_lut.get(&possible[cdx]).unwrap();
             let (position_sets, _) = astar_bag_collect(
                 &Position {
                     current: alpha,
                     direction: (isize::MAX, isize::MAX),
                 },
-                |p| p.successors(&lg_maze),
+                |p| p.successors(keypad_maze),
                 |p| p.heuristic(omega),
                 |p| p.current == omega,
             )
@@ -108,195 +133,43 @@ fn part(filename: &str, _is_part1: bool) -> usize {
                     // println!("{:?} {:?}", position.current, position.direction);
                     if position.direction.0 != isize::MAX {
                         // valid direction
-                        push_set.push(*inv_direction.get(&position.direction).unwrap());
+                        push_set.push(*direction_lut.get(&position.direction).unwrap());
                     }
                 }
                 // println!("dbug {}", positions.len());
                 push_set.push('A');
                 push_options.push(push_set);
             }
-            push_0.push(push_options);
+            fleeb.push(push_options);
         }
-        // unzip possible paths
-        let push_0_unravel = unravel_combinations(push_0);
-        // println!("{:?}", push_0_unravel);
-
-        // only keep shortest paths
-        let mut push_0_shortest: Vec<Vec<char>> = Vec::new();
-        let mut max_len = usize::MAX;
-        for possible in &push_0_unravel {
-            if possible.len() < max_len {
-                max_len = possible.len();
-            }
-        }
-        for possible in &push_0_unravel {
-            if possible.len() == max_len {
-                push_0_shortest.push(possible.clone());
-            }
-        }
-        for possible in &push_0_shortest {
-            println!("push_0 {} {}",possible.len(), possible.clone().into_iter().collect::<String>(), )
-            // println!("push_0 {} {}", push_0.clone().into_iter().collect::<String>(), push_0.len());
-        }
-
-        // determine path on next small keypad
-        let mut push_1: Vec<Vec<char>> = Vec::new();
-        for possible in &push_0_shortest {
-            let mut fleeb:  Vec<Vec<Vec<char>>> = Vec::new();
-            for cdx in 0..possible.len() {
-                if cdx == 0 {
-                    alpha = (0usize, 2usize); // start pointed at A
-                } else {
-                    alpha = *sm_keypad.get(&possible[cdx - 1]).unwrap();
-                }
-                omega = *sm_keypad.get(&possible[cdx]).unwrap();
-                let (position_sets, _) = astar_bag_collect(
-                    &Position {
-                        current: alpha,
-                        direction: (isize::MAX, isize::MAX),
-                    },
-                    |p| p.successors(&sm_maze),
-                    |p| p.heuristic(omega),
-                    |p| p.current == omega,
-                )
-                .unwrap();
-
-                let mut push_options: Vec<Vec<char>> = Vec::new();
-                for positions in &position_sets {
-                    let mut push_set: Vec<char> = Vec::new();
-                    for position in positions {
-                        // println!("{:?} {:?}", position.current, position.direction);
-                        if position.direction.0 != isize::MAX {
-                            // valid direction
-                            push_set.push(*inv_direction.get(&position.direction).unwrap());
-                        }
-                    }
-                    // println!("dbug {}", positions.len());
-                    push_set.push('A');
-                    push_options.push(push_set);
-                }
-                fleeb.push(push_options);
-
-                // for position in &positions {
-                //     // println!("{:?} {:?}", position.current, position.direction);
-                //     if position.direction.0 != isize::MAX {
-                //         // valid direction
-                //         push_2.push(*inv_direction.get(&position.direction).unwrap());
-                //     }
-                // }
-                // // println!("dbug {}", positions.len());
-                // push_2.push('A');
-            }
-            let fleeb_unravel = unravel_combinations(fleeb);
-            push_1.extend(fleeb_unravel);
-            // println!("{:?}", fleeb_unravel);
-        }
-
-        // only keep shortest paths
-        let mut push_1_shortest: Vec<Vec<char>> = Vec::new();
-        let mut max_len = usize::MAX;
-        for possible in &push_1 {
-            if possible.len() < max_len {
-                max_len = possible.len();
-            }
-        }
-        for possible in &push_1 {
-            if possible.len() == max_len {
-                push_1_shortest.push(possible.clone());
-            }
-        }
-
-        println!("");
-        for possible in &push_1_shortest {
-            println!("push_1 {} {}",possible.len(), possible.clone().into_iter().collect::<String>(), )
-            // println!("push_0 {} {}", push_0.clone().into_iter().collect::<String>(), push_0.len());
-        }
-
-        // determine path on last small keypad
-        let mut push_2: Vec<Vec<char>> = Vec::new();
-        for possible in &push_1_shortest {
-            let mut fleeb:  Vec<Vec<Vec<char>>> = Vec::new();
-            for cdx in 0..possible.len() {
-                if cdx == 0 {
-                    alpha = (0usize, 2usize); // start pointed at A
-                } else {
-                    alpha = *sm_keypad.get(&possible[cdx - 1]).unwrap();
-                }
-                omega = *sm_keypad.get(&possible[cdx]).unwrap();
-                let (position_sets, _) = astar_bag_collect(
-                    &Position {
-                        current: alpha,
-                        direction: (isize::MAX, isize::MAX),
-                    },
-                    |p| p.successors(&sm_maze),
-                    |p| p.heuristic(omega),
-                    |p| p.current == omega,
-                )
-                .unwrap();
-
-                let mut push_options: Vec<Vec<char>> = Vec::new();
-                for positions in &position_sets {
-                    let mut push_set: Vec<char> = Vec::new();
-                    for position in positions {
-                        // println!("{:?} {:?}", position.current, position.direction);
-                        if position.direction.0 != isize::MAX {
-                            // valid direction
-                            push_set.push(*inv_direction.get(&position.direction).unwrap());
-                        }
-                    }
-                    // println!("dbug {}", positions.len());
-                    push_set.push('A');
-                    push_options.push(push_set);
-                }
-                fleeb.push(push_options);
-
-                // for position in &positions {
-                //     // println!("{:?} {:?}", position.current, position.direction);
-                //     if position.direction.0 != isize::MAX {
-                //         // valid direction
-                //         push_2.push(*inv_direction.get(&position.direction).unwrap());
-                //     }
-                // }
-                // // println!("dbug {}", positions.len());
-                // push_2.push('A');
-            }
-            let fleeb_unravel = unravel_combinations(fleeb);
-            push_2.extend(fleeb_unravel);
-            // println!("{:?}", fleeb_unravel);
-
-        }
-
-        // only keep shortest paths
-        let mut push_2_shortest: Vec<Vec<char>> = Vec::new();
-        let mut max_len = usize::MAX;
-        for possible in &push_2 {
-            if possible.len() < max_len {
-                max_len = possible.len();
-            }
-        }
-        for possible in &push_2 {
-            if possible.len() == max_len {
-                push_2_shortest.push(possible.clone());
-            }
-        }
-
-        println!("");
-        for possible in &push_2_shortest {
-            println!("push_2 {} {}",possible.len(), possible.clone().into_iter().collect::<String>(), )
-        }
-
-
-        // println!("push_0 {} {}", push_0.clone().into_iter().collect::<String>(), push_0.len());
-        // println!("push_1 {} {}", push_1.clone().into_iter().collect::<String>(), push_1.len());
-        // println!("push_2 {} {}", push_2.clone().into_iter().collect::<String>(), push_2.len());
-        // determine path on first small keypad
-        // determine path on last small keypad
-        // let shortest: usize = max_len;
-        // println!("{:?} {}", code, code_numeric);
-        complexity += max_len * code_numeric;
-
+        let fleeb_unravel = unravel_combinations(fleeb);
+        push_1.extend(fleeb_unravel);
+        // println!("{:?}", fleeb_unravel);
     }
-    return complexity;
+
+    // only keep shortest paths
+    let mut push_1_shortest: Vec<Vec<char>> = Vec::new();
+    let mut max_len = usize::MAX;
+    // find shortest path len
+    for possible in &push_1 {
+        if possible.len() < max_len {
+            max_len = possible.len();
+        }
+    }
+    for possible in &push_1 {
+        if possible.len() == max_len {
+            push_1_shortest.push(possible.clone());
+        }
+    }
+
+    // for possible in &push_1_shortest {
+    //     println!(
+    //         "len={} path={}",
+    //         possible.len(),
+    //         possible.clone().into_iter().collect::<String>(),
+    //     )
+    // }
+    return (push_1_shortest, max_len);
 }
 
 /// since our pathfinding is between chars, we need to unravel the possibilities to allow sanity in our life
@@ -377,7 +250,6 @@ impl Position {
 pub fn solve(day: usize) {
     assert_eq!(part(&format!("input/{:02}_train", day), true), 126384);
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
-    // assert_eq!(part(&format!("input/{:02}_train", day), false), 123);
     // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
-    // println!("Coded: xx Minutes");
+    // println!("Coded: 42+60*3+ Minutes");
 }
