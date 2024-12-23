@@ -101,12 +101,8 @@ fn main() {
             fetch::get_data(&year, &day);
             elapsed += solve_timer(&day);
         }
-
-        println!(
-            "Advent of Code {} Runtime = {:.3} s",
-            year,
-            elapsed as f32 / 1e6
-        );
+        println!("Advent of Code {}", year);
+        println!("Total Runtime = {:.3} s", elapsed as f32 / 1e6);
     } else if let Result::Ok(day) = arg.parse::<usize>() {
         fetch::get_data(&year, &day);
         solve_timer(&day);

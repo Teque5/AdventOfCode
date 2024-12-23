@@ -1,8 +1,10 @@
 use aoc;
-use std::cmp::max;
-use indicatif::{ProgressBar, ProgressStyle};
+use indicatif::{ParallelProgressIterator, ProgressStyle};
+use rayon::prelude::*;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
-/// Monkey Psudorandom Sequence
+/// Monkey Market
+/// Prices are pseudorandomly generated
 fn part(filename: &str, is_part1: bool) -> usize {
     let mut acc = 0usize;
     let mut operand: usize;
@@ -40,27 +42,26 @@ fn part(filename: &str, is_part1: bool) -> usize {
             diffs.push(diff);
         }
     }
-    if !is_part1 {
-        acc = 0;
-        let progress = ProgressBar::new((19 * 19 * 19 * 19) as u64);
-        progress.set_style(ProgressStyle::with_template(aoc::STYLE).unwrap());
-        progress.set_message("Counting Bananas...");
-        for (cdx, combo) in generate_combinations().iter().enumerate() {
-            let mut bananas = 0usize;
-            for vdx in 0..initial_numbers.len() {
-                if let Some(offset) = find_offset(&diffs[vdx], &combo) {
-                    bananas += prices[vdx][offset+4] as usize;
-                    // println!("{} {:?} {}", vdx, offset, prices[vdx][offset+4]);
+    if is_part1 {
+        return acc;
+    } else {
+        // for part 2 to try all combinations and see how many bananas we can get
+        let acc = AtomicUsize::new(0);
+        let style = ProgressStyle::with_template(aoc::STYLE).unwrap();
+        generate_combinations()
+            .par_iter()
+            .progress_with_style(style)
+            .for_each(|combo| {
+                let mut bananas = 0usize;
+                for vdx in 0..initial_numbers.len() {
+                    if let Some(offset) = find_offset(&diffs[vdx], &combo) {
+                        bananas += prices[vdx][offset + 4] as usize;
+                    }
                 }
-            }
-            progress.set_position(cdx as u64);
-            acc = max(acc, bananas);
-        }
-        let sequence: Vec<i8> = vec![-2,1,-1,3];
-        // println!("price {:?}",prices);
-        // println!("diffs {:?}",diffs);
+                acc.fetch_max(bananas, Ordering::Relaxed);
+            });
+        return acc.load(Ordering::Relaxed);
     }
-    return acc;
 }
 
 /// create all possible combinations for price changes
@@ -78,8 +79,10 @@ fn generate_combinations() -> Vec<Vec<i8>> {
     combinations
 }
 
+/// find offset of needle in haystack
 fn find_offset(haystack: &Vec<i8>, needle: &Vec<i8>) -> Option<usize> {
-    haystack.windows(needle.len())
+    haystack
+        .windows(needle.len())
         .position(|window| window == needle.as_slice())
 }
 
@@ -95,9 +98,9 @@ fn mix(secret: usize, operator: usize) -> usize {
 
 /// Check training data, then apply to test data
 pub fn solve(day: usize) {
-    // assert_eq!(part(&format!("input/{:02}_train0", day), true), 37327623);
-    // println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
+    assert_eq!(part(&format!("input/{:02}_train0", day), true), 37327623);
+    println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
     assert_eq!(part(&format!("input/{:02}_train1", day), false), 23);
     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
-    // println!("Coded: 45+ Minutes");
+    println!("Coded: 105 Minutes");
 }
