@@ -63,17 +63,18 @@ fn part(filename: &str, is_part1: bool) -> String {
         }
         return check_results(&zzz, "z".to_string()).to_string();
     } else {
-        println!("{:?}", keys_for_processing);
-        // pretend x and y are all 1s and find the bogus gates?
+        // gradually turn all bits of x and y on to determine bad gates
+        // keep track of # of errors; swap gates until 0 errors
 
         // let x_val = check_results(&lut, "x".to_string());
         // let y_val = check_results(&lut, "y".to_string());
+        let width = keys_for_processing.len();
         let mut dummy_lut: HashMap<String, u8> = HashMap::new();
-        for idx in 0..keys_for_processing.len() {
+        for idx in 0..width {
             dummy_lut.insert(format!("x{:02}", idx), 0);
             dummy_lut.insert(format!("y{:02}", idx), 0);
         }
-        for idx in 0..keys_for_processing.len() {
+        for idx in 0..width {
             dummy_lut.insert(format!("x{:02}", idx), 1);
             dummy_lut.insert(format!("y{:02}", idx), 1);
             for key in &keys_for_processing {
@@ -82,14 +83,25 @@ fn part(filename: &str, is_part1: bool) -> String {
                 // println!("{}", result);
             }
             let z_current = check_results(&zzz, "z".to_string());
+            println!("current={:0width$b}", z_current);
+            println!("target ={:0width$b}", 1<<idx);
+            for jdx in 0..keys_for_processing.len() {
+                if ((z_current >> jdx) & 1) == 0 && jdx == idx {
+                    // for idx == jdx, output should be 1
+                    println!("{} problem with z{:02} output", idx, jdx);
+                    // println!("{}", keys_for_processing[jdx])
+                } else if ((z_current >> jdx) & 1) == 1 && jdx != idx {
+                    // for idx != jdx, output should be 0
+                    println!("{} problem with z{:02} output", idx, jdx);
+                    // println!("{} problem with x{:02} or y{:02} processing", idx, jdx, jdx);
+                    // println!("{}", keys_for_processing[jdx])
+                } else {
+                    // println!("{} wire {} ok", idx, jdx);
+                }
+            }
+            // reset dummy_lut
             dummy_lut.insert(format!("x{:02}", idx), 0);
             dummy_lut.insert(format!("y{:02}", idx), 0);
-            // println!("digit={} res={}", idx, (z_current >> idx) & 1);
-            if ((z_current >> idx) & 1) == 0 {
-                println!("problem with x{:02} or y{:02} processing", idx, idx);
-            } else {
-                println!("wire {} ok", idx);
-            }
         }
         // println!("{:?}", dummy_lut);
         // for key in keys_for_processing {
@@ -155,5 +167,5 @@ pub fn solve(day: usize) {
     //     "z00,z01,z02,z05"
     // );
     println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
-    println!("Coded: xx Minutes");
+    println!("Coded: 39+120+ Minutes");
 }
