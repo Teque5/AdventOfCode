@@ -78,9 +78,40 @@ fn part(filename: &str, is_part1: bool) -> usize {
         let code_chars: Vec<char> = code.chars().collect();
         let paths = vec![code_chars];
         let (paths, _max_len) = keypad(&paths, &lg_keypad, &lg_maze, (3, 2), &direction_lut);
+        println!("0 {}", paths.len());
         let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        println!("1 {}", paths.len());
         let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
-
+        println!("2 {}", paths.len());
+        // if !is_part1 {
+        //     // do paths 23 more times; for loop seems to fail here, reference issue
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     println!("3 {}", paths.len());
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     println!("4 {}", paths.len());
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     println!("5 {}", paths.len());
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        //     let (paths, _max_len) = keypad(&paths, &sm_keypad, &sm_maze, (0, 2), &direction_lut);
+        // }
 
         // println!("");
         // for possible in &paths {
@@ -250,6 +281,6 @@ impl Position {
 pub fn solve(day: usize) {
     assert_eq!(part(&format!("input/{:02}_train", day), true), 126384);
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
-    // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+    println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
     // println!("Coded: 42+60*3+ Minutes");
 }
