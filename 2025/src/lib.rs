@@ -289,7 +289,7 @@ impl Image<'_> {
         self.fdx += 1;
     }
 
-    /// write framed to animated webp
+    /// write frames to animated webp
     pub fn render_webp(&self, file_path: &str) {
         let glob_path = format!("{}", self.dir.path().join("aoc_*.png").display());
         println!("rendering {} imgs to {}", self.fdx, file_path);
