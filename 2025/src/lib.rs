@@ -121,7 +121,8 @@ pub struct Image<'a> {
     dir: TempDir,
     rows: usize,
     cols: usize,
-    fdx: u16,      // frame index
+    fdx: usize,      // frame index
+    frameskip: usize,
     alpha: f32,    // fade alpha
     framerate: u8, // gif framerate
 }
@@ -159,6 +160,7 @@ impl Image<'_> {
             rows: rows,
             cols: cols,
             fdx: 0,
+            frameskip: 1,
             alpha: 0.05,
             framerate: 15,
         }
@@ -187,6 +189,20 @@ impl Image<'_> {
             pixel[1] = 0;
             pixel[2] = 0;
         }
+    }
+
+    /// print img info
+    pub fn info(&self) {
+        // fdx, size, alpha, framerate, tempdir path
+        println!(
+            "Image: {}x{} px, {} frames, alpha {:.2}, framerate {} fps, tempdir {:?}",
+            self.img.width(),
+            self.img.height(),
+            self.fdx,
+            self.alpha,
+            self.framerate,
+            self.dir.path()
+        );
     }
 
     /// draw exactly 1 or more chars at (row, col)
@@ -275,6 +291,10 @@ impl Image<'_> {
         self.framerate = new_framerate;
     }
 
+    pub fn set_frameskip(&mut self, new_frameskip: usize) {
+        self.frameskip = new_frameskip;
+    }
+
     // frame rendering
 
     /// save current frame to specific file
@@ -284,15 +304,19 @@ impl Image<'_> {
 
     /// Save current frame to temp dir
     pub fn render_frame(&mut self) {
-        let file_path = self.dir.path().join(format!("aoc_{:05}.png", self.fdx));
-        self.img.save(file_path).expect("save failed");
+        // check for frameskip
+        if self.fdx % self.frameskip == 0 {
+            let file_path = self.dir.path().join(format!("aoc_{:08}.png", self.fdx));
+            self.img.save(file_path).expect("save failed");
+        }
         self.fdx += 1;
+
     }
 
     /// write frames to animated webp
     pub fn render_webp(&self, file_path: &str) {
         let glob_path = format!("{}", self.dir.path().join("aoc_*.png").display());
-        println!("rendering {} imgs to {}", self.fdx, file_path);
+        println!("Image: rendering {} imgs to {}", self.fdx, file_path);
         Command::new("ffmpeg")
             .args([
                 "-y",
@@ -321,7 +345,7 @@ impl Image<'_> {
     /// write frames to animated GIF
     /// for very small images the one pass approach is often better
     pub fn render_gif(&self, file_path: &str) {
-        println!("rendering {} imgs to {}", self.fdx, file_path);
+        println!("Image: rendering {} imgs to {}", self.fdx, file_path);
         let glob_path = format!("{}", self.dir.path().join("aoc_*.png").display());
         // one pass
         // Command::new("ffmpeg")
