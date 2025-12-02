@@ -12,7 +12,7 @@ use std::time;
 mod fetch;
 
 mod day01;
-// mod day02;
+mod day02;
 // mod day03;
 // mod day04;
 // mod day05;
@@ -28,7 +28,7 @@ mod day01;
 lazy_static! {
     static ref SOLUTIONS: HashMap<usize, fn(usize)> = vec![
         (1, day01::solve as _),
-        // (2, day02::solve as _),
+        (2, day02::solve as _),
         // (3, day03::solve as _),
         // (4, day04::solve as _),
         // (5, day05::solve as _),

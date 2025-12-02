@@ -59,7 +59,7 @@ fn part(filename: &str, is_part1: bool, render: bool) -> usize {
     }
 
     if render {
-        for _ in 0..5*15 {
+        for _ in 0..5 * 15 {
             img.fade();
             img.draw_text(0, 0, &format!("Zeros: {}", acc));
             img.render_frame();
@@ -72,10 +72,16 @@ fn part(filename: &str, is_part1: bool, render: bool) -> usize {
 /// Check training data, then apply to test data
 pub fn solve(day: usize) {
     assert_eq!(part(&format!("input/{:02}_train", day), true, false), 3);
-    println!("Part1: {}", part(&format!("input/{:02}_test", day), true, false));
+    println!(
+        "Part1: {}",
+        part(&format!("input/{:02}_test", day), true, false)
+    );
 
     assert_eq!(part(&format!("input/{:02}_train", day), false, true), 6);
-    println!("Part2: {}", part(&format!("input/{:02}_test", day), false, false));
+    println!(
+        "Part2: {}",
+        part(&format!("input/{:02}_test", day), false, false)
+    );
 
     println!("Coded: 88 minutes; out of practice.");
 }
