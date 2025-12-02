@@ -121,7 +121,7 @@ pub struct Image<'a> {
     dir: TempDir,
     rows: usize,
     cols: usize,
-    fdx: usize,      // frame index
+    fdx: usize, // frame index
     frameskip: usize,
     alpha: f32,    // fade alpha
     framerate: u8, // gif framerate
@@ -310,7 +310,6 @@ impl Image<'_> {
             self.img.save(file_path).expect("save failed");
         }
         self.fdx += 1;
-
     }
 
     /// write frames to animated webp
