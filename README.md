@@ -5,18 +5,22 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 ## Using
 
 1. `export AOC_SESSION=D34DBEEF` before running to get input dynamically from AoC server. [How to get session cookie.](https://github.com/wimglenn/advent-of-code-wim/issues/1)
-2. `cd 2024; cargo run 4` runs just `Day04.rs`
+2. `cd YYYY; cargo run 4` runs just `Day04.rs`
 3. `cargo run all` runs all days
 4. `cargo run --release all` for fastest benchmark
 5. `cargo test --doc` runs all tests
 
 ## Annual Thoughts
 
+* **2025**: Rust & more visualizations
 * **2024**: Rustaceans assemble! Focusing on faster solutions this year. Caching in rust feels quite clumsy compared to python's `@lru_cache` decorator.
 * **2023**: Going with rust again!
 * **2022**: Using this as an opportunity to learn [rust](https://www.rust-lang.org/). I did use python on some of the puzzles where I was racing against colleagues. :D
 
 ## Visualizations
+
+### 2025 Day01: Secret Entrance
+![2025 Day01: Secret Entrance](2025/img/day01.webp)
 
 ### 2024 Day18: RAM Run
 ![2024 Day14: RAM Run](2024/img/day18.gif)
