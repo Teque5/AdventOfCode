@@ -41,11 +41,11 @@ pub fn read_lines_as<T: FromStr>(filename: &str) -> Vec<T> {
         .collect()
 }
 
-/// read a file with rectangular text block as a 2d array of chars
+/// read a file with rectangular text block as a 2d array of type T
 /// 123
 /// 456
 /// 789
-pub fn read_2d_chars(filename: &str) -> (Array2<char>, usize, usize) {
+pub fn read_2d_as<T: FromStr>(filename: &str) -> (Array2<T>, usize, usize) {
     let mut file = File::open(filename).unwrap();
     let mut buffer = Vec::new();
     // read file to bytes
@@ -59,17 +59,24 @@ pub fn read_2d_chars(filename: &str) -> (Array2<char>, usize, usize) {
     buffer.retain(|&x| x >= 32);
     let charbuffer = buffer.iter().map(|b| *b as char).collect::<Vec<_>>();
     let rows = charbuffer.len() / cols;
-    // println!("dbug {} {} {}", rows, cols, charbuffer.len());
-    let ray = Array2::from_shape_vec((rows, cols), charbuffer).unwrap();
+    // parse each character as type T, skip unparseable chars
+    let parsed_buffer: Vec<T> = charbuffer
+        .iter()
+        .filter_map(|c| c.to_string().parse::<T>().ok())
+        .collect();
+    let ray = Array2::from_shape_vec((rows, cols), parsed_buffer).unwrap();
     return (ray, rows, cols);
 }
 
-/// print 2d array of chars
+/// print 2d array of any displayable type
 #[allow(dead_code)]
-pub fn print_2d_chars(ray: &Array2<char>) {
+pub fn print_2d<T: std::fmt::Display>(ray: &Array2<T>) {
     for row in ray.axis_iter(Axis(0)) {
-        let some_string: String = row.into_iter().collect();
-        println!("{:}", some_string);
+        for (cdx, value) in row.iter().enumerate() {
+            // if cdx > 0 { print!(" "); }
+            print!("{}", value);
+        }
+        println!();
     }
 }
 
