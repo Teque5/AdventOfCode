@@ -1,9 +1,9 @@
 use aoc;
 
 /// Gift Shop
-fn part(filename: &str, is_part1: bool, _render: bool) -> usize {
-    let mut acc = 0usize; // invalid ID sum
-                          // parse info
+fn part(filename: &str, is_part1: bool) -> usize {
+    let mut acc = 0usize;
+    // parse info
     let lines = aoc::read_lines(filename);
     // line is like XXXX-YYYY,XXXX-YYYY,XXXX-YYYY... read line as series of tuples
     for line in lines {
@@ -60,23 +60,11 @@ fn part(filename: &str, is_part1: bool, _render: bool) -> usize {
 
 /// Check training data, then apply to test data
 pub fn solve(day: usize) {
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), true, false),
-        1227775554
-    );
-    println!(
-        "Part1: {}",
-        part(&format!("input/{:02}_test", day), true, false)
-    );
+    assert_eq!(part(&format!("input/{:02}_train", day), true), 1227775554);
+    println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    assert_eq!(
-        part(&format!("input/{:02}_train", day), false, true),
-        4174379265
-    );
-    println!(
-        "Part2: {}",
-        part(&format!("input/{:02}_test", day), false, false)
-    );
+    assert_eq!(part(&format!("input/{:02}_train", day), false), 4174379265);
+    println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
 
     println!("Coded: 40 minutes.");
 }
