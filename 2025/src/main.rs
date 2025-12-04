@@ -9,7 +9,7 @@ extern crate lazy_static;
 use std::collections::HashMap;
 use std::env;
 use std::time;
-mod fetch;
+use aoc;
 
 mod day01;
 mod day02;
@@ -72,13 +72,13 @@ fn main() {
         let mut keys: Vec<&usize> = SOLUTIONS.keys().collect();
         keys.sort(); // Print in order...
         for day in keys.iter() {
-            fetch::get_data(&year, &day);
+            aoc::get_data(&year, &day);
             elapsed += solve_timer(&day);
         }
         println!("Advent of Code {}", year);
         println!("Total Runtime = {:.3} s", elapsed as f32 / 1e6);
     } else if let Result::Ok(day) = arg.parse::<usize>() {
-        fetch::get_data(&year, &day);
+        aoc::get_data(&year, &day);
         solve_timer(&day);
     } else {
         eprintln!("Usage: 'cargo run [day#]' or 'cargo run all'");
