@@ -1,11 +1,12 @@
 use aoc;
 
 /// Dial Password, Count Zeros on Circular Dial
-fn part(filename: &str, is_part1: bool, render: bool) -> usize {
+fn part(filename: &str, is_part1: bool) -> usize {
     let mut acc = 0usize; // zero count
     let mut dial = 50isize; // dial position
     let mut turn: isize; // change amount
     let mut direction: isize; // change direction
+    let render = !is_part1 && filename.contains("train");
     let mut img = aoc::Image::new(1, 100);
     img.set_frameskip(5);
 
@@ -71,17 +72,11 @@ fn part(filename: &str, is_part1: bool, render: bool) -> usize {
 
 /// Check training data, then apply to test data
 pub fn solve(day: usize) {
-    assert_eq!(part(&format!("input/{:02}_train", day), true, false), 3);
-    println!(
-        "Part1: {}",
-        part(&format!("input/{:02}_test", day), true, false)
-    );
+    assert_eq!(part(&format!("input/{:02}_train", day), true), 3);
+    println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    assert_eq!(part(&format!("input/{:02}_train", day), false, true), 6);
-    println!(
-        "Part2: {}",
-        part(&format!("input/{:02}_test", day), false, false)
-    );
+    assert_eq!(part(&format!("input/{:02}_train", day), false), 6);
+    println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
 
     println!("Coded: 88 minutes; out of practice.");
 }
