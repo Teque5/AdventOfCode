@@ -15,7 +15,7 @@ fn part(filename: &str, is_part1: bool) -> usize {
         img.draw_bool(0, dial as usize, true);
         img.draw_text(0, 0, &format!("Zeros: {}", acc));
         img.render_frame();
-        img.info();
+        // img.info();
     }
 
     // parse info
