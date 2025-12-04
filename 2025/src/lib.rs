@@ -12,13 +12,30 @@ use std::process::Command;
 use std::str::FromStr;
 use tempfile::{tempdir, TempDir};
 
-/// commonly used directions (row, col) for mazes and whatnot
-pub const DIRECTIONS: [(isize, isize); 4] = [
+/// 6 commonly used directions (row, col) for mazes and whatnot
+pub const FOUR_DIRECTIONS: [(isize, isize); 4] = [
     (-1, 0), // up
     (1, 0),  // down
     (0, -1), // left
     (0, 1),  // right
 ];
+
+/// 8 commonly used directions (row, col) for mazes & whatnot
+pub const EIGHT_DIRECTIONS: [(isize, isize); 8] = [
+    (-1, -1), // up-left
+    (-1, 0),  // up
+    (-1, 1),  // up-right
+    (0, -1),  // left
+    (0, 1),   // right
+    (1, -1),  // down-left
+    (1, 0),   // down
+    (1, 1),   // down-right
+];
+
+/// Check if a position is within map edges for mazes & whatnot
+pub fn is_in_map(rows: usize, cols: usize, position: (isize, isize)) -> bool {
+    position.0 >= 0 && position.1 >= 0 && position.0 < rows as isize && position.1 < cols as isize
+}
 
 /// style string for indicatif::ProgressBar
 pub const STYLE: &str = "{bar:40.cyan/blue} {pos:>9}/{len:9} [{eta} left] {msg}";
@@ -222,7 +239,7 @@ impl Image {
     /// 8 (default) is pixel-perfect for text
     /// 4 is barely resolvable
     /// 1 is for tiny pixel plotting using draw_bool
-    pub fn set_fontsize(&mut self, size_px: f32) {
+    pub fn set_scale(&mut self, size_px: f32) {
         self.scale.x = size_px;
         self.scale.y = size_px;
         self.img = RgbImage::new(
@@ -310,11 +327,11 @@ impl Image {
         }
     }
 
-    /// draw full image from Array2<char>
-    pub fn draw_chars(&mut self, ray: &Array2<char>) {
+    /// draw full image from Array2<T>
+    pub fn draw_chars<T: std::fmt::Display>(&mut self, ray: &Array2<T>) {
         // draw new image row-by-row
         for (rdx, row) in ray.rows().into_iter().enumerate() {
-            let full_row: String = row.iter().collect();
+            let full_row: String = row.iter().map(|x| x.to_string()).collect();
             let y_offset = (rdx as f32 * self.scale.y) as i32;
             draw_text_mut(
                 &mut self.img,
@@ -379,10 +396,10 @@ impl Image {
                 &glob_path,
                 "-vcodec",
                 "libwebp",
-                "-quality", // enable lossy (not usually worth it)
-                "75",
-                // "-lossless", // enable lossless
-                // "1",
+                // "-quality", // enable lossy (not usually worth it)
+                // "75",
+                "-lossless", // enable lossless
+                "1",
                 "-loop", // loop forever
                 "0",
                 "-preset",
