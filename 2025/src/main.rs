@@ -62,6 +62,15 @@ fn solve_timer(day: &usize) -> usize {
 
 /// Main entry point looks at command-line arguments.
 fn main() {
+    // Ensure we're running from a year directory (starts with "20")
+    let current_dir = std::env::current_dir().expect("Failed to get current directory");
+    let dir_name = current_dir.file_name().unwrap().to_str().unwrap();
+
+    if !dir_name.starts_with("20") {
+        eprintln!("Error: This program must be run from a year directory.");
+        std::process::exit(1);
+    }
+
     let year: usize = 2025;
     let args: Vec<String> = env::args().collect();
     let arg = args.last().unwrap_or(&EMPTY_STRING);
