@@ -33,21 +33,24 @@ macro_rules! impl_to_bool_for_integers {
 
 impl_to_bool_for_integers!(i8, u8, i16, u16, i32, u32, i64, u64, isize, usize);
 
-impl ToBool for f32 {
-    fn to_bool(&self) -> bool {
-        *self != 0.0
-    }
+macro_rules! impl_to_bool_for_floats {
+    ($($float_type:ty),*) => {
+        $(
+            impl ToBool for $float_type {
+                fn to_bool(&self) -> bool {
+                    *self != 0.0
+                }
+            }
+        )*
+    };
 }
 
-impl ToBool for f64 {
-    fn to_bool(&self) -> bool {
-        *self != 0.0
-    }
-}
+impl_to_bool_for_floats!(f32, f64);
 
+/// convert all chars not in ' .' to true
 impl ToBool for char {
     fn to_bool(&self) -> bool {
-        *self != ' '
+        *self != ' ' && *self != '.'
     }
 }
 
@@ -155,13 +158,10 @@ impl Image {
     /// 8 (default) is pixel-perfect for text
     /// 4 is barely resolvable
     /// 1 is for tiny pixel plotting using draw_bool
-    pub fn set_scale(&mut self, size_px: f32) {
-        self.scale.x = size_px;
-        self.scale.y = size_px;
-        self.img = RgbImage::new(
-            (self.scale.x as usize * self.cols) as u32,
-            (self.scale.y as usize * self.rows) as u32,
-        );
+    pub fn set_scale(&mut self, size_px: usize) {
+        self.scale.x = size_px as f32;
+        self.scale.y = size_px as f32;
+        self.img = RgbImage::new((size_px * self.cols) as u32, (size_px * self.rows) as u32);
     }
 
     // drawing subroutines
@@ -239,7 +239,9 @@ impl Image {
     /// draw full image from Array2<T> as booleans
     pub fn draw_bools<T: ToBool>(&mut self, ray: &Array2<T>) {
         for ((row, col), value) in ray.indexed_iter() {
-            self.draw_bool(row, col, value.to_bool());
+            if value.to_bool() {
+                self.draw_bool(row, col, true);
+            }
         }
     }
 
@@ -300,7 +302,8 @@ impl Image {
     /// write frames to animated webp
     pub fn render_webp(&self, file_path: &str) {
         let glob_path = format!("{}", self.dir.path().join("aoc_*.png").display());
-        println!("Image: rendering {} imgs to {}", self.fdx, file_path);
+        let num_images = (self.fdx + self.frameskip - 1) / self.frameskip;
+        println!("Image: rendering {} imgs to {} ", num_images, file_path);
         Command::new("ffmpeg")
             .args([
                 "-y",
@@ -310,59 +313,72 @@ impl Image {
                 "glob",
                 "-i",
                 &glob_path,
+                "-vf",
+                "format=yuv420p",
                 "-vcodec",
-                "libwebp",
-                // "-quality", // enable lossy (not usually worth it)
-                // "75",
-                "-lossless", // enable lossless
-                "1",
-                "-loop", // loop forever
+                // new 2025 encoder
+                "libwebp_anim",
+                "-lossless",
                 "0",
-                "-preset",
-                "drawing",
+                // 6 takes way too long
+                "-compression_level",
+                "5",
+                // loop forever
+                "-loop",
+                "0",
                 file_path,
             ])
             .output()
             .expect("ffmpeg failed");
+        Self::print_file_size(file_path);
     }
 
     /// write frames to animated GIF
     /// for very small images the one pass approach is often better
     pub fn render_gif(&self, file_path: &str) {
-        println!("Image: rendering {} imgs to {}", self.fdx, file_path);
+        let num_images = (self.fdx + self.frameskip - 1) / self.frameskip;
+        println!("Image: rendering {} imgs to {} ", num_images, file_path);
         let glob_path = format!("{}", self.dir.path().join("aoc_*.png").display());
         // one pass
-        // Command::new("ffmpeg")
-        //     .args([
-        //         "-y",
-        //         "-framerate",
-        //         &format!("{}", self.framerate),
-        //         "-pattern_type",
-        //         "glob",
-        //         "-i",
-        //         &glob_path,
-        //         file_path,
-        //     ])
-        //     .output()
-        //     .expect("ffmpeg pass 1 failed");
-        // two pass
-        let pal_path = format!("{}", self.dir.path().join("palette.png").display());
-        // Pass 1
         Command::new("ffmpeg")
             .args([
                 "-y",
+                "-framerate",
+                &format!("{}", self.framerate),
+                "-pattern_type",
+                "glob",
+                "-i",
+                &glob_path,
+                file_path,
+            ])
+            .output()
+            .expect("ffmpeg failed");
+        Self::print_file_size(file_path);
+    }
+
+    pub fn render_gif_two_pass(&self, file_path: &str) {
+        let num_images = (self.fdx + self.frameskip - 1) / self.frameskip;
+        println!("Image: rendering {} imgs to {} ", num_images, file_path);
+        let glob_path = format!("{}", self.dir.path().join("aoc_*.png").display());
+        let palette_path = self.dir.path().join("palette.png");
+        // first pass: generate palette
+        Command::new("ffmpeg")
+            .args([
+                "-y",
+                "-framerate",
+                &format!("{}", self.framerate),
                 "-pattern_type",
                 "glob",
                 "-i",
                 &glob_path,
                 "-vf",
                 "palettegen",
-                &pal_path,
+                "-y",
+                &format!("{}", palette_path.display()),
             ])
             .output()
-            .expect("ffmpeg pass 1 failed");
-
-        // Pass 2
+            .expect("ffmpeg failed");
+        // second pass: generate gif using palette
         Command::new("ffmpeg")
             .args([
                 "-y",
@@ -373,12 +389,20 @@ impl Image {
                 "-i",
                 &glob_path,
                 "-i",
-                &pal_path,
+                &format!("{}", palette_path.display()),
                 "-lavfi",
                 "paletteuse",
                 file_path,
             ])
             .output()
-            .expect("ffmpeg pass 2 failed");
+            .expect("ffmpeg failed");
+        Self::print_file_size(file_path);
+    }
+
+    fn print_file_size(file_path: &str) {
+        if let Ok(metadata) = std::fs::metadata(file_path) {
+            let size_kb = metadata.len() / 1024;
+            println!("Image: wrote {:.1} KB", size_kb as f64);
+        }
     }
 }

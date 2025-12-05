@@ -49,11 +49,11 @@ fn part(filename: &str, is_part1: bool) -> usize {
     let _render = !is_part1 && filename.contains("test");
     let mut img = aoc::Image::new(rows, cols);
     if _render {
-        img.set_scale(2.0);
-        img.draw_chars(&map);
+        img.set_scale(2);
+        img.draw_bools(&map);
         img.render_frame();
-        img.set_frameskip(2);
-        img.set_alpha(0.2);
+        img.set_frameskip(3);
+        img.set_alpha(0.01);
     }
 
     if is_part1 {
@@ -67,14 +67,14 @@ fn part(filename: &str, is_part1: bool) -> usize {
         acc += remove_rolls(&mut map, rows, cols);
         if _render {
             img.fade();
-            img.draw_chars(&map);
+            img.draw_bools(&map);
             img.render_frame();
         }
     }
     if _render {
         for _ in 0..15 {
             img.fade();
-            img.draw_chars(&map);
+            img.draw_bools(&map);
             img.render_frame();
         }
         img.render_gif("img/day04.gif");

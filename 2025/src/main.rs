@@ -6,10 +6,10 @@
 #[macro_use]
 extern crate lazy_static;
 
+use aoc;
 use std::collections::HashMap;
 use std::env;
 use std::time;
-use aoc;
 
 mod day01;
 mod day02;
