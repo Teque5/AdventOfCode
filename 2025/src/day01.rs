@@ -6,17 +6,12 @@ fn part(filename: &str, is_part1: bool) -> usize {
     let mut dial = 50isize; // dial position
     let mut turn: isize; // change amount
     let mut direction: isize; // change direction
-    let render = !is_part1 && filename.contains("train");
-    let mut img = aoc::Image::new(1, 100);
-    img.set_frameskip(5);
-
-    if render {
-        // fancy plot for part 2
-        img.draw_bool(0, dial as usize, true);
-        img.draw_text(0, 0, &format!("Zeros: {}", acc));
-        img.render_frame();
-        // img.info();
-    }
+                              // img is for part 2 training data
+                              // let mut img = aoc::Image::new(1, 100);
+                              // img.set_frameskip(5);
+                              // img.draw_bool(0, dial as usize, true);
+                              // img.draw_text(0, 0, &format!("Zeros: {}", acc));
+                              // img.render_frame();
 
     // parse info
     let lines = aoc::read_lines(filename);
@@ -49,24 +44,20 @@ fn part(filename: &str, is_part1: bool) -> usize {
                 if dial == 0 {
                     acc += 1;
                 }
-                if render {
-                    img.fade();
-                    img.draw_bool(0, dial as usize, true);
-                    img.draw_text(0, 0, &format!("Zeros: {}", acc));
-                    img.render_frame();
-                }
+                // img.fade();
+                // img.draw_bool(0, dial as usize, true);
+                // img.draw_text(0, 0, &format!("Zeros: {}", acc));
+                // img.render_frame();
             }
         }
     }
+    // for _ in 0..5 * 15 {
+    //     img.fade();
+    //     img.draw_text(0, 0, &format!("Zeros: {}", acc));
+    //     img.render_frame();
+    // }
+    // img.render_webp("img/day01.webp");
 
-    if render {
-        for _ in 0..5 * 15 {
-            img.fade();
-            img.draw_text(0, 0, &format!("Zeros: {}", acc));
-            img.render_frame();
-        }
-        img.render_webp(&"img/day01.webp");
-    }
     return acc;
 }
 
