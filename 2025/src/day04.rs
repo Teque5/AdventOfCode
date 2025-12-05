@@ -1,7 +1,9 @@
 use aoc;
 use ndarray::Array2;
 
-/// Count positions with '@' that have fewer than 4 adjacent '@' neighbors
+/// Printing Department
+/// Ostensibly count movable rolls of paper
+/// Actually iteratively count positions with '@' that have fewer than 4 adjacent '@' neighbors
 fn remove_rolls(map: &mut Array2<char>, rows: usize, cols: usize) -> usize {
     let mut acc = 0usize;
     let mut map_changes = Vec::new();

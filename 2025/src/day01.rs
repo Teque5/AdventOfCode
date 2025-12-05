@@ -1,17 +1,20 @@
 use aoc;
 
-/// Dial Password, Count Zeros on Circular Dial
+/// Secret Engrance
+/// Ostensibly get the password
+/// Actually count zero crossings
 fn part(filename: &str, is_part1: bool) -> usize {
     let mut acc = 0usize; // zero count
     let mut dial = 50isize; // dial position
     let mut turn: isize; // change amount
     let mut direction: isize; // change direction
-                              // img is for part 2 training data
-                              // let mut img = aoc::Image::new(1, 100);
-                              // img.set_frameskip(5);
-                              // img.draw_bool(0, dial as usize, true);
-                              // img.draw_text(0, 0, &format!("Zeros: {}", acc));
-                              // img.render_frame();
+
+    // img is for part 2 training data
+    // let mut img = aoc::Image::new(1, 100);
+    // img.set_frameskip(5);
+    // img.draw_bool(0, dial as usize, true);
+    // img.draw_text(0, 0, &format!("Zeros: {}", acc));
+    // img.render_frame();
 
     // parse info
     let lines = aoc::read_lines(filename);
