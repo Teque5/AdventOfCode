@@ -1,6 +1,8 @@
 use aoc;
 
 /// Gift Shop
+/// Ostensibly look for invalid product IDs
+/// Actually look for repeated digit patterns
 fn part(filename: &str, is_part1: bool) -> usize {
     let mut acc = 0usize;
     // parse info
