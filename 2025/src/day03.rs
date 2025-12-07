@@ -1,16 +1,21 @@
 use aoc;
+use ndarray::Array2;
 
 /// Lobby
-/// Pick highest joltage by pairing numbers from each row
+/// Ostensibly pick highest joltage
+/// Actually find highest digits by seeking backwards
 fn part(filename: &str, is_part1: bool) -> usize {
     let mut joltage = 0usize;
     // parse info
     let (banks, rows, cols) = aoc::read_2d_as::<usize>(filename);
-    // aoc::print_2d(&banks);
-
     let num_digits = if is_part1 { 2usize } else { 12usize };
+    // let mut img = aoc::Image::new(rows + 1, cols + 1 + num_digits);
+    // img.set_alpha(0.2);
+    // img.set_scale(8);
+    // img.draw_chars(&banks);
+    // img.render_frame();
+    let mut buffer = Array2::<usize>::zeros((rows, num_digits));
     for rdx in 0..rows {
-        let mut buffer: Vec<usize> = vec![0; num_digits];
         // left edge will scan right
         let mut left_edge = 0usize;
         for digit in 0..num_digits {
@@ -23,18 +28,38 @@ fn part(filename: &str, is_part1: bool) -> usize {
                 if banks[[rdx, cdx]] >= maxval {
                     maxval = banks[[rdx, cdx]];
                     maxcdx = cdx;
-                    buffer[digit] = maxval;
+                    buffer[[rdx, digit]] = maxval;
                     left_edge = maxcdx + 1;
                 }
+                // for ((row, col), value) in buffer.indexed_iter() {
+                //     if *value != 0 {
+                //         img.draw_text(
+                //             row,
+                //             cols + col + 1,
+                //             &char::from_u32(0x30 + *value as u32).unwrap().to_string(),
+                //         );
+                //     }
+                // }
+                // img.draw_chars(&banks);
+                // img.draw_bool(rdx, cdx, true);
+                // img.draw_text(rows, 0, &format!("Joltage={}", joltage));
+                // img.render_frame();
+                // img.fade();
             }
         }
         // convert buffer to number
         let mut number = 0usize;
         for digit in 0..num_digits {
-            number = number * 10 + buffer[digit];
+            number = number * 10 + buffer[[rdx, digit]];
         }
         joltage += number;
     }
+    // for _ in 0..30 {
+    //     img.draw_text(rows, 0, &format!("Joltage={}", joltage));
+    //     img.render_frame();
+    //     img.fade();
+    // }
+    // img.render_gif("img/day03.gif");
     return joltage;
 }
 

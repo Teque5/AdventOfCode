@@ -22,6 +22,9 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 ### 2025 Day04: Printing Department
 ![2025 Day04: Printing Department](2025/img/day04.gif)
 
+### 2025 Day03: Lobby
+![2025 Day03: Lobby](2025/img/day03.gif)
+
 ### 2025 Day01: Secret Entrance
 ![2025 Day01: Secret Entrance](2025/img/day01.webp)
 
