@@ -1,5 +1,6 @@
 use aoc;
-use std::collections::HashMap;
+// use std::collections::HashMap;
+use indicatif::{ProgressBar, ProgressStyle};
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -19,9 +20,7 @@ impl Position {
 }
 
 /// Playground
-fn part(filename: &str, _is_part1: bool) -> usize {
-    let mut acc = 0usize;
-    // position, circuit index
+fn part1(filename: &str) -> usize {
     let mut positions = Vec::<Position>::new();
     let mut circuits = Vec::<isize>::new();
     // parse
@@ -41,7 +40,9 @@ fn part(filename: &str, _is_part1: bool) -> usize {
     let mut next_circuit = 0isize;
     let mut pairs = HashSet::<(usize, usize)>::new();
     let num_connections = if filename.contains("train") { 10 } else { 1000 };
-    for ndx in 0..num_connections {
+    let progress = ProgressBar::new(num_connections as u64);
+    progress.set_style(ProgressStyle::with_template(aoc::STYLE).unwrap());
+    for _ in 0..num_connections {
         let mut min_dist = std::f64::MAX;
         let mut min_pair = (0usize, 0usize);
         for ldx in 0..positions.len() {
@@ -64,10 +65,9 @@ fn part(filename: &str, _is_part1: bool) -> usize {
                 }
             }
         }
+        progress.inc(1);
         pairs.insert(min_pair);
-        println!("{} Min pair: {:?} at distance {}", ndx, min_pair, min_dist);
-        let left_pos = positions[min_pair.0];
-        let right_pos = positions[min_pair.1];
+
         let left_circuit = circuits[min_pair.0];
         let right_circuit = circuits[min_pair.1];
         if left_circuit == -1 && right_circuit == -1 {
@@ -90,7 +90,7 @@ fn part(filename: &str, _is_part1: bool) -> usize {
             });
         }
     }
-    println!("Final circuits: {:?}", circuits);
+    progress.finish_and_clear();
     // count size of each circuit
     let mut circuit_sizes = vec![0; (next_circuit) as usize];
     for circuit in circuits.iter() {
@@ -98,17 +98,14 @@ fn part(filename: &str, _is_part1: bool) -> usize {
             circuit_sizes[*circuit as usize] += 1;
         }
     }
-    println!("Circuit sizes: {:?}", circuit_sizes);
 
     // multiply sizes of three largest circuits
     circuit_sizes.sort();
     circuit_sizes.reverse();
-    acc = circuit_sizes.iter().take(3).product();
-    return acc;
+    return circuit_sizes.iter().take(3).product();
 }
 
-fn part2(filename: &str, _is_part1: bool) -> usize {
-    let mut acc = 0usize;
+fn part2(filename: &str) -> usize {
     // position, circuit index
     let mut positions = Vec::<Position>::new();
     let mut circuits = Vec::<isize>::new();
@@ -125,11 +122,12 @@ fn part2(filename: &str, _is_part1: bool) -> usize {
         circuits.push(-1);
         // println!("{} {:?}", positions.len() - 1, pos);
     }
+    // create new progressbar with total number of positions
+    let progress = ProgressBar::new(100u64);
+    progress.set_style(ProgressStyle::with_template(aoc::STYLE).unwrap());
 
     let mut next_circuit = 0isize;
     let mut pairs = HashSet::<(usize, usize)>::new();
-    let num_connections = if filename.contains("train") { 10 } else { 1000 };
-    let mut ndx = 0usize;
     loop {
         let mut min_dist = std::f64::MAX;
         let mut min_pair = (0usize, 0usize);
@@ -154,9 +152,6 @@ fn part2(filename: &str, _is_part1: bool) -> usize {
             }
         }
         pairs.insert(min_pair);
-        println!("{} Min pair: {:?} at distance {}", ndx, min_pair, min_dist);
-        let left_pos = positions[min_pair.0];
-        let right_pos = positions[min_pair.1];
         let left_circuit = circuits[min_pair.0];
         let right_circuit = circuits[min_pair.1];
         if left_circuit == -1 && right_circuit == -1 {
@@ -178,33 +173,27 @@ fn part2(filename: &str, _is_part1: bool) -> usize {
                 }
             });
         }
-        ndx += 1;
-        // exit if all circuits are equal
-
-        // bla
         let unique_circuits: HashSet<isize> = circuits.iter().cloned().collect();
-        if unique_circuits.len() == 1 {
-            // print last connected circuits
-            println!("break {:?} {:?}", left_circuit, right_circuit);
-            println!(
-                "break {:?} {:?}",
-                positions[min_pair.0], positions[min_pair.1]
-            );
-            acc = (positions[min_pair.0].x as usize) * (positions[min_pair.1].x as usize);
-            break;
+        let num_circuits = unique_circuits.len();
+        if num_circuits < 100 {
+            progress.set_position(101 - unique_circuits.len() as u64);
+        }
+        progress.set_message(format!("num_circuits = {}", num_circuits));
+        if num_circuits == 1 {
+            // exit if only one circuit remains
+            progress.finish_and_clear();
+            return (positions[min_pair.0].x as usize) * (positions[min_pair.1].x as usize);
         }
     }
-    // println!("Final circuits: {:?}", circuits);
-    return acc;
 }
 
 /// Check training data, then apply to test data
 pub fn solve(day: usize) {
-    // assert_eq!(part(&format!("input/{:02}_train", day), true), 40);
-    // println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
+    assert_eq!(part1(&format!("input/{:02}_train", day)), 40);
+    println!("Part1: {}", part1(&format!("input/{:02}_test", day)));
 
-    assert_eq!(part2(&format!("input/{:02}_train", day), false), 25272);
-    println!("Part2: {}", part2(&format!("input/{:02}_test", day), false));
+    assert_eq!(part2(&format!("input/{:02}_train", day)), 25272);
+    println!("Part2: {}", part2(&format!("input/{:02}_test", day)));
 
     println!("Coded: 107 minutes.");
 }
