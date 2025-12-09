@@ -19,7 +19,7 @@ mod day05;
 mod day06;
 mod day07;
 mod day08;
-// mod day09;
+mod day09;
 // mod day10;
 // mod day11;
 // mod day12;
@@ -35,7 +35,7 @@ lazy_static! {
         (6, day06::solve as _),
         (7, day07::solve as _),
         (8, day08::solve as _),
-        // (9, day09::solve as _),
+        (9, day09::solve as _),
         // (10, day10::solve as _),
         // (11, day11::solve as _),
         // (12, day12::solve as _),
