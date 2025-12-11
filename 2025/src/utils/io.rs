@@ -49,7 +49,6 @@ pub fn read_2d_as<T: FromStr>(filename: &str) -> (Array2<T>, usize, usize) {
 }
 
 /// print 2d array of any displayable type
-#[allow(dead_code)]
 pub fn print_2d<T: std::fmt::Display>(ray: &Array2<T>) {
     for row in ray.axis_iter(Axis(0)) {
         for value in row.iter() {

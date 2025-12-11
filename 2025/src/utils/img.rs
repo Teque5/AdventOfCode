@@ -97,7 +97,6 @@ fn download_unscii(font_path: &PathBuf) -> Option<Vec<u8>> {
     Some(font_data)
 }
 
-#[allow(dead_code)]
 pub struct Image {
     img: RgbImage,
     font: FontRef<'static>,
@@ -120,7 +119,6 @@ pub struct Image {
 ///     img.fade();
 /// }
 /// img.render_gif("out.gif");
-#[allow(dead_code)]
 impl Image {
     /// create new image surface
     pub fn new(rows: usize, cols: usize) -> Self {
