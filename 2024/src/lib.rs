@@ -5,10 +5,12 @@ use image::{Rgb, RgbImage};
 use imageproc::drawing::draw_text_mut;
 use ndarray::{Array2, Axis};
 use std::fs::File;
+use std::fs::create_dir_all;
 use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Read;
 use std::io::Result;
+use std::path::PathBuf;
 use std::process::Command;
 use std::str::FromStr;
 use tempfile::{tempdir, TempDir};
@@ -113,10 +115,47 @@ pub fn parse_numbers<T: FromStr>(line: &str) -> Vec<T> {
         .collect()
 }
 
+// Font downloading
+
+const UNSCII_FONT: &str = "unscii-8";
+const UNSCII_FONT_URL: &str = "https://github.com/viznut/unscii/raw/refs/heads/main/fontfiles";
+
+fn get_cache_dir() -> std::io::Result<PathBuf> {
+    let home = std::env::var("HOME").expect("HOME environment variable not set");
+    let cache_dir = PathBuf::from(home).join(".cache").join("aoc-fonts");
+    create_dir_all(&cache_dir)?;
+    Ok(cache_dir)
+}
+
+pub fn get_cached_font() -> std::io::Result<Vec<u8>> {
+    let cache_dir = get_cache_dir()?;
+    let cache_path = cache_dir.join(format!("{}.otf", UNSCII_FONT));
+    if cache_path.exists() {
+        return std::fs::read(&cache_path);
+    }
+    println!("Downloading {} font from GitHub...", UNSCII_FONT);
+    let data = download_unscii(&cache_path).expect("Failed to download font");
+    println!("Font cached to: {:?}", cache_path);
+    Ok(data)
+}
+
+fn download_unscii(font_path: &PathBuf) -> Option<Vec<u8>> {
+    let font_filename = format!("{}.otf", UNSCII_FONT);
+    let font_url = format!("{}/{}", UNSCII_FONT_URL, font_filename);
+    let client = reqwest::blocking::Client::new();
+    let response = client.get(&font_url).send().ok()?;
+    if !response.status().is_success() {
+        return None;
+    }
+    let font_data = response.bytes().ok()?.to_vec();
+    std::fs::write(font_path, &font_data).ok()?;
+    Some(font_data)
+}
+
 #[allow(dead_code)]
-pub struct Image<'a> {
+pub struct Image {
     img: RgbImage,
-    font: FontRef<'a>,
+    font: FontRef<'static>,
     scale: PxScale,
     dir: TempDir,
     rows: usize,
@@ -136,11 +175,14 @@ pub struct Image<'a> {
 /// }
 /// img.render_gif("out.gif");
 #[allow(dead_code)]
-impl Image<'_> {
+impl Image {
     /// create new image surface
     pub fn new(rows: usize, cols: usize) -> Self {
-        // font needs to be monospace
-        let font = FontRef::try_from_slice(include_bytes!("../../unscii-8.otf")).unwrap();
+        // font needs to be monospace - get cached version
+        let font_data = get_cached_font().expect("Failed to get font");
+        // leak the font data to get a 'static reference for FontRef
+        let static_font_data = Box::leak(font_data.into_boxed_slice());
+        let font = FontRef::try_from_slice(static_font_data).unwrap();
         let scale = PxScale {
             x: 8.0, // fixed for unscii-8
             y: 8.0, // fixed for unscii-8
