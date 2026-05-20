@@ -21,7 +21,7 @@ tempfile = "3.14.0"
 
 # useful crates from prior years
 #rayon = "1.10.0"
-#lru = "0.12.5"
+#lru = "0.16.3"
 
 [[bin]]
 name = "advent_of_code_2025"
