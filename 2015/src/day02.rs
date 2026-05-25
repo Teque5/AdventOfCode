@@ -3,13 +3,13 @@ use std::cmp;
 
 /// I Was Told There Would Be No Math
 /// calculate required wrapping paper
-fn part(filename: &str, is_part1: bool) -> isize {
-    let mut acc = 0isize;
+fn part(filename: &str, is_part1: bool) -> usize {
+    let mut acc = 0usize;
 
     // parse info
     let lines = aoc::read_lines(filename);
     for line in lines {
-        let dims = aoc::parse_numbers::<isize>(&line);
+        let dims = aoc::parse_numbers::<usize>(&line);
         let (length, width, height) = (dims[0], dims[1], dims[2]);
         if is_part1 {
             // calculate paper area
@@ -28,7 +28,7 @@ fn part(filename: &str, is_part1: bool) -> isize {
             acc += slack;
         } else {
             // calculate ribbon
-            let mut short = length + width + height - cmp::max(length, cmp::max(width, height));
+            let short = length + width + height - cmp::max(length, cmp::max(width, height));
             // length is double shortest two sides plus volume for bow
             acc += short * 2 + length * width * height;
         }
