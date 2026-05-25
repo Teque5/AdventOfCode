@@ -13,6 +13,7 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 
 ## Annual Thoughts
 
+* **2015**: Going back to the beginning in 2026.
 * **2025**: Rust & more visualizations
 * **2024**: Rustaceans assemble! Focusing on faster solutions this year. Caching in rust feels quite clumsy compared to python's `@lru_cache` decorator.
 * **2023**: Going with rust again!
