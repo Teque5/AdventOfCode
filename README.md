@@ -9,6 +9,7 @@ This is repository holds my solutions to the [Advent of Code](https://adventofco
 3. `cargo run all` runs all days
 4. `cargo run --release all` for fastest benchmark
 5. `cargo test --doc` runs all tests
+6. `AOC_RENDER=1 cargo run all` to render visualizations (if implemented)
 
 ## Annual Thoughts
 

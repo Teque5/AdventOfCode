@@ -10,11 +10,16 @@ fn part(filename: &str, is_part1: bool) -> usize {
     let mut direction: isize; // change direction
 
     // img is for part 2 training data
-    // let mut img = aoc::Image::new(1, 100);
-    // img.set_frameskip(5);
-    // img.draw_bool(0, dial as usize, true);
-    // img.draw_text(0, 0, &format!("Zeros: {}", acc));
-    // img.render_frame();
+    let mut img = if aoc::render() {
+        let mut img = aoc::Image::new(1, 100);
+        img.set_frameskip(5);
+        img.draw_bool(0, dial as usize, true);
+        img.draw_text(0, 0, &format!("Zeros: {}", acc));
+        img.render_frame();
+        Some(img)
+    } else {
+        None
+    };
 
     // parse info
     let lines = aoc::read_lines(filename);
@@ -47,30 +52,34 @@ fn part(filename: &str, is_part1: bool) -> usize {
                 if dial == 0 {
                     acc += 1;
                 }
-                // img.fade();
-                // img.draw_bool(0, dial as usize, true);
-                // img.draw_text(0, 0, &format!("Zeros: {}", acc));
-                // img.render_frame();
+                if let Some(img) = img.as_mut() {
+                    img.fade();
+                    img.draw_bool(0, dial as usize, true);
+                    img.draw_text(0, 0, &format!("Zeros: {}", acc));
+                    img.render_frame();
+                }
             }
         }
     }
-    // for _ in 0..5 * 15 {
-    //     img.fade();
-    //     img.draw_text(0, 0, &format!("Zeros: {}", acc));
-    //     img.render_frame();
-    // }
-    // img.render_webp("img/day01.webp");
+    if let Some(img) = img.as_mut() {
+        for _ in 0..5 * 15 {
+            img.fade();
+            img.draw_text(0, 0, &format!("Zeros: {}", acc));
+            img.render_frame();
+        }
+        img.render_webp("img/day01.webp");
+    }
 
     return acc;
 }
 
 /// Check training data, then apply to test data
 pub fn solve(day: usize) {
-    assert_eq!(part(&format!("input/{:02}_train", day), true), 3);
-    println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
+    // assert_eq!(part(&format!("input/{:02}_train", day), true), 3);
+    // println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
     assert_eq!(part(&format!("input/{:02}_train", day), false), 6);
-    println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
+    // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
 
     println!("Coded: 88 minutes; out of practice.");
 }

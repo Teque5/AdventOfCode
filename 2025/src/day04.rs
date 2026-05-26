@@ -48,34 +48,44 @@ fn remove_rolls(map: &mut Array2<char>, rows: usize, cols: usize) -> usize {
 fn part(filename: &str, is_part1: bool) -> usize {
     // parse info
     let (mut map, rows, cols) = aoc::read_2d_as::<char>(filename);
-    // img for part 2 test data
-    // let mut img = aoc::Image::new(rows, cols);
-    // img.set_scale(2);
-    // img.draw_bools(&map);
-    // img.render_frame();
-    // img.set_frameskip(3);
-    // img.set_alpha(0.01);
 
     if is_part1 {
         return remove_rolls(&mut map, rows, cols);
     }
+
     // part 2
+    let mut img = if aoc::render() {
+        let mut img = aoc::Image::new(rows, cols);
+        img.set_scale(2);
+        img.draw_bools(&map);
+        img.render_frame();
+        img.set_frameskip(3);
+        img.set_alpha(0.01);
+        Some(img)
+    } else {
+        None
+    };
+
     let mut acc = 0usize;
     let mut acc_prev = usize::MAX;
     while acc != acc_prev {
         acc_prev = acc;
         acc += remove_rolls(&mut map, rows, cols);
-        // img.fade();
-        // img.draw_bools(&map);
-        // img.render_frame();
+        if let Some(img) = img.as_mut() {
+            img.fade();
+            img.draw_bools(&map);
+            img.render_frame();
+        }
     }
-    // for _ in 0..15 {
-    //     img.fade();
-    //     img.draw_bools(&map);
-    //     img.render_frame();
-    // }
-    // img.render_gif("img/day04.gif");
-    return acc;
+    if let Some(img) = img.as_mut() {
+        for _ in 0..15 {
+            img.fade();
+            img.draw_bools(&map);
+            img.render_frame();
+        }
+        img.render_gif("img/day04.gif");
+    }
+    acc
 }
 
 /// Check training data, then apply to test data

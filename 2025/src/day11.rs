@@ -94,6 +94,8 @@ fn follow(
     acc
 }
 
+
+#[allow(dead_code)]
 fn follow_dac_fft(
     names: &HashMap<String, usize>,
     servers: &HashMap<usize, Vec<usize>>,

@@ -67,6 +67,12 @@ fn get_cache_dir() -> std::io::Result<PathBuf> {
     Ok(cache_dir)
 }
 
+/// When we want to render visualizations, set AOC_RENDER=1
+/// return true if rendering is enabled
+pub fn render() -> bool {
+    std::env::var("AOC_RENDER").is_ok()
+}
+
 /// Get font data, downloading and caching if necessary
 pub fn get_cached_font() -> std::io::Result<Vec<u8>> {
     let cache_dir = get_cache_dir()?;
@@ -302,7 +308,7 @@ impl Image {
         let glob_path = format!("{}", self.dir.path().join("aoc_*.png").display());
         let num_images = (self.fdx + self.frameskip - 1) / self.frameskip;
         println!("Image: rendering {} imgs to {} ", num_images, file_path);
-        Command::new("ffmpeg")
+        let output = Command::new("ffmpeg")
             .args([
                 "-y",
                 "-framerate",
@@ -327,7 +333,10 @@ impl Image {
                 file_path,
             ])
             .output()
-            .expect("ffmpeg failed");
+            .expect("ffmpeg failed to spawn");
+        if !output.status.success() {
+            eprintln!("ffmpeg stderr: {}", String::from_utf8_lossy(&output.stderr));
+        }
         Self::print_file_size(file_path);
     }
 
