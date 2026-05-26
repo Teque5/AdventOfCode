@@ -89,7 +89,7 @@ pub fn solve(day: usize) {
     assert_eq!(part(&format!("input/{:02}_train", day), true), 7);
     println!("Part1: {}", part(&format!("input/{:02}_test", day), true));
 
-    println!("Part 2 Unfinished");
+    println!("Part 2 Not Started");
     // assert_eq!(part(&format!("input/{:02}_train", day), false), 33);
     // println!("Part2: {}", part(&format!("input/{:02}_test", day), false));
 
