@@ -67,6 +67,12 @@ fn get_cache_dir() -> std::io::Result<PathBuf> {
     Ok(cache_dir)
 }
 
+/// When we want to render visualizations, set AOC_RENDER=1
+/// return true if rendering is enabled
+pub fn render() -> bool {
+    std::env::var("AOC_RENDER").is_ok()
+}
+
 /// Get font data, downloading and caching if necessary
 pub fn get_cached_font() -> std::io::Result<Vec<u8>> {
     let cache_dir = get_cache_dir()?;
