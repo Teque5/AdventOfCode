@@ -12,15 +12,12 @@ image = "0.25.10"
 imageproc = "0.26.2"
 indicatif = "0.18.4"
 lazy_static = "1.5.0"
+md5 = "0.8.0"
 ndarray = "0.17.2"
 pathfinding = "4.15.0"
 regex = "1.12.3"
 reqwest = { version = "0.13.4", features = ["blocking"] }
 tempfile = "3.27.0"
-
-# useful crates from prior years
-#rayon = "1.10.0"
-#lru = "0.12.5"
 
 [[bin]]
 name = "advent_of_code_2015"

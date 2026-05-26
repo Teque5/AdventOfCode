@@ -1,7 +1,6 @@
 use aoc;
 use std::collections::HashSet;
 
-/// Perfectly Spherical Houses in a Vacuum
 fn step(pos: &mut (isize, isize), direction: char) {
     match direction {
         '^' => pos.1 -= 1,
@@ -12,6 +11,7 @@ fn step(pos: &mut (isize, isize), direction: char) {
     }
 }
 
+/// Perfectly Spherical Houses in a Vacuum
 fn part(filename: &str, is_part1: bool) -> usize {
     let mut santa = (0isize, 0isize);
     let mut robot = (0isize, 0isize);
